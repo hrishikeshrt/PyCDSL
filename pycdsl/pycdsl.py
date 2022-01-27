@@ -10,7 +10,7 @@ Download dictionaries from https://www.sanskrit-lexicon.uni-koeln.de/
 
 from pathlib import Path
 from dataclasses import dataclass, field
-from functools import cached_property, lru_cache
+from functools import lru_cache
 import zipfile
 
 from peewee import fn
@@ -175,7 +175,8 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    @cached_property
+    @property
+    @lru_cache(maxsize=32)
     def stats(self):
         lex = self._lexicon
         total_count = lex.select().count()
