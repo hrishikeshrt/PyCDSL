@@ -1,5 +1,5 @@
 Welcome to Python Interface to Cologne Digital Sanskrit Lexicon (CDSL)'s documentation!
-======================================
+=======================================================================================
 
 .. toctree::
    :maxdepth: 2
