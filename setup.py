@@ -10,7 +10,13 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ ]
+requirements = [
+    'beautifulsoup4>=4.10.0',
+    'indic_transliteration>=2.2.4',
+    'peewee>=3.14.4',
+    'requests>=2.26.0',
+    'requests_downloader>=0.2.3'
+]
 
 test_requirements = ['pytest>=3', ]
 
@@ -31,7 +37,7 @@ setup(
     description="Access various dictionaries from CDSL (Cologne Digital Sanskrit Lexicon)",
     entry_points={
         'console_scripts': [
-            'pycdsl=pycdsl.cli:main',
+            'cdsl=pycdsl.cli:main',
         ],
     },
     install_requires=requirements,

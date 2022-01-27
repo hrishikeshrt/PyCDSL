@@ -4,4 +4,3 @@ peewee>=3.14.4
 pytest>=6.2.4
 requests>=2.26.0
 requests_downloader>=0.2.3
-setuptools>=58.0.4
