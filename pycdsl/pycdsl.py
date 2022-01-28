@@ -60,7 +60,7 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    def download(self, download_dir, symlink_dir=None):
+    def download(self, download_dir):
         """Download and extract dictionary data
 
         Parameters
@@ -68,11 +68,6 @@ class CDSLDict:
         download_dir : str or Path
             Full path of directory where the dictionary data should be
             downloaded and extracted
-        symlink_dir : str or Path, optional
-            Full path of the directory where the symbolink links to the
-            SQLite database of dictionary will be created
-            If None, symbolic links aren't created.
-            The default is None.
 
         Returns
         -------
@@ -89,10 +84,6 @@ class CDSLDict:
         download_dir = Path(download_dir)
 
         last_modified_file = download_dir / "last_modified.txt"
-        database_filename = f"{self.id.lower()}.sqlite"
-        database_path = download_dir / "web" / "sqlite" / database_filename
-        self.db = str(database_path)
-
         download_dir.mkdir(parents=True, exist_ok=True)
 
         if last_modified_file.exists():
@@ -142,6 +133,43 @@ class CDSLDict:
                 zipref.extractall(download_dir)
         else:
             print(f"Dictionary data for '{self.id}' is already up-to-date.")
+        return True
+
+    def setup(self, data_dir, symlink_dir=None, update=False):
+        """Setup the dictionary database path
+
+        Parameters
+        ----------
+        data_dir : str or Path
+            Full path of directory where the dictionary data is stored
+        symlink_dir : str or Path, optional
+            Full path of the directory where the symbolink links to the
+            SQLite database of dictionary will be created
+            If None, symbolic links aren't created.
+            The default is None.
+        update : bool, optional
+            If True, an attempt to update dictionary data will be made.
+            The default is False.
+
+        Returns
+        -------
+        bool
+            True if the setup was successful
+        """
+        # setup database path
+        data_dir = Path(data_dir)
+        database_filename = f"{self.id.lower()}.sqlite"
+        database_path = data_dir / "web" / "sqlite" / database_filename
+        self.db = str(database_path)
+
+        status = (
+            (not update and database_path.exists())
+            or
+            self.download(download_dir=data_dir)
+        )
+        if not status:
+            print(f"Couldn't setup dictionary '{self.id}'.")
+            return False
 
         # create symlink
         if symlink_dir is not None:
@@ -200,6 +228,21 @@ class CDSLDict:
 
     @lru_cache(maxsize=4096)
     def search(self, search_key, ignore_case=False):
+        """Search in the dictionary
+
+        Parameters
+        ----------
+        search_key : str
+            Search key, may contain wildcards.
+        ignore_case : bool, optional
+            Ignore case while performing lookup.
+            The default is False.
+
+        Returns
+        -------
+        list
+            List of matching entries
+        """
         query = self._lexicon.select().where(self._lexicon.key % search_key)
         iquery = self._lexicon.select().where(self._lexicon.key ** search_key)
         search_query = iquery if ignore_case else query
@@ -207,6 +250,21 @@ class CDSLDict:
             self._entry(result)
             for result in search_query
         ]
+
+    def entry(self, entry_id):
+        """Get an entry by ID
+
+        Parameters
+        ----------
+        entry_id : Decimal
+            Entry ID
+
+        Returns
+        -------
+        object
+            Matching entry
+        """
+        return self._entry(self._lexicon.get(self._lexicon.id == entry_id))
 
 ###############################################################################
 
@@ -236,13 +294,13 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
-    def setup(self, dict_ids: list = None):
+    def setup(self, dict_ids: list = None, update: bool = False):
         """Download and setup CDSL dictionaries in bulk"""
         self.available_dicts = self.get_available_dicts()
         if dict_ids is None:
-            download_dicts = self.available_dicts
+            setup_dicts = self.available_dicts
         elif isinstance(dict_ids, list):
-            download_dicts = {
+            setup_dicts = {
                 dict_id: cdsl_dict
                 for dict_id, cdsl_dict in self.available_dicts.items()
                 if dict_id in dict_ids
@@ -251,11 +309,12 @@ class CDSLCorpus:
             raise ValueError("`dict_ids` must be a `list` or `None`")
 
         status = []
-        for dict_id, cdsl_dict in download_dicts.items():
+        for dict_id, cdsl_dict in setup_dicts.items():
             dict_dir = self.dict_dir / dict_id
-            success = cdsl_dict.download(
-                download_dir=dict_dir,
-                symlink_dir=self.db_dir
+            success = cdsl_dict.setup(
+                data_dir=dict_dir,
+                symlink_dir=self.db_dir,
+                update=update
             )
             status.append(success)
             if success:

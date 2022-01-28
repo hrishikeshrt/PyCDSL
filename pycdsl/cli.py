@@ -111,6 +111,14 @@ class CDSLShell(BasicShell):
         for _, cdsl_dict in self.cdsl.available_dicts.items():
             print(cdsl_dict)
 
+    # ----------------------------------------------------------------------- #
+
+    def do_update(self, text):
+        """Update downloaded dictionaries"""
+        self.cdsl.setup(list(self.cdsl._dicts), update=True)
+
+    # ----------------------------------------------------------------------- #
+
     def do_use(self, dict_id):
         """Use a specific lexicon"""
         dict_id = dict_id.upper()
@@ -123,6 +131,15 @@ class CDSLShell(BasicShell):
             print(f"Couldn't setup dictionary '{dict_id}'.")
 
     # ----------------------------------------------------------------------- #
+
+    def do_show(self, entry_id):
+        """Show a specific entry by ID"""
+        if self.dict is None:
+            print("Please select a dictionary first.")
+        else:
+            result = self.dict.entry(entry_id)
+            print(result)
+            print(f"Raw: {result.data}")
 
     def default(self, line):
         if self.dict is None:
