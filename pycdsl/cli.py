@@ -8,6 +8,7 @@ from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
 from .pycdsl import CDSLCorpus
+from . import __version__
 
 ###############################################################################
 
@@ -148,13 +149,20 @@ class CDSLShell(BasicShell):
             print(result)
             print(f"Raw: {result.data}")
 
+    # ----------------------------------------------------------------------- #
+
+    def do_version(self, text):
+        print(__version__)
+
+    # ----------------------------------------------------------------------- #
+
     def default(self, line):
         if self.dict is None:
             print("Please select a dictionary first.")
         else:
-            search_key = line if self.dict.english_keys else transliterate(
+            search_key = transliterate(
                 line, self.input_scheme, sanscript.DEVANAGARI
-            )
+            ) if self.dict.transliterate_keys else line
             results = self.dict.search(search_key)[:50]
             for result in results:
                 print(result)
