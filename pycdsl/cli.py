@@ -115,18 +115,25 @@ class CDSLShell(BasicShell):
 
     def do_update(self, text):
         """Update downloaded dictionaries"""
-        self.cdsl.setup(list(self.cdsl._dicts), update=True)
+        self.cdsl.setup(list(self.cdsl.dicts), update=True)
 
     # ----------------------------------------------------------------------- #
+
+    def complete_use(self, text, line, begidx, endidx):
+        return [
+            dict_id
+            for dict_id in self.cdsl.available_dicts
+            if dict_id.startswith(text.upper())
+        ]
 
     def do_use(self, dict_id):
         """Use a specific lexicon"""
         dict_id = dict_id.upper()
-        status = (dict_id in self.cdsl._dicts) or self.cdsl.setup([dict_id])
+        status = (dict_id in self.cdsl.dicts) or self.cdsl.setup([dict_id])
         if status:
             self.active = dict_id
             self.prompt = f"(CDSL::{self.active}) "
-            self.dict = self.cdsl._dicts[dict_id]
+            self.dict = self.cdsl.dicts[dict_id]
         else:
             print(f"Couldn't setup dictionary '{dict_id}'.")
 

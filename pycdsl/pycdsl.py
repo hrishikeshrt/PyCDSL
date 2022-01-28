@@ -284,11 +284,12 @@ class CDSLCorpus:
         )
         self.dict_dir = self.data_dir / "dict"
         self.db_dir = self.data_dir / "db"
-        self._dicts = {}
+        self.dicts = {}
+        self.available_dicts = self.get_available_dicts()
 
     def __getattr__(self, attr: str):
-        if attr in self._dicts:
-            return self._dicts[attr]
+        if attr in self.dicts:
+            return self.dicts[attr]
         else:
             raise AttributeError
 
@@ -296,7 +297,6 @@ class CDSLCorpus:
 
     def setup(self, dict_ids: list = None, update: bool = False):
         """Download and setup CDSL dictionaries in bulk"""
-        self.available_dicts = self.get_available_dicts()
         if dict_ids is None:
             setup_dicts = self.available_dicts
         elif isinstance(dict_ids, list):
@@ -319,7 +319,7 @@ class CDSLCorpus:
             status.append(success)
             if success:
                 cdsl_dict.connect()
-                self._dicts[dict_id] = cdsl_dict
+                self.dicts[dict_id] = cdsl_dict
 
         return bool(status) and all(status)
 
