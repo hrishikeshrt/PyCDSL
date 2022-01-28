@@ -39,6 +39,7 @@ DICTIONARIES = {
     "AP90": (AP90Lexicon, AP90Entry),
 }
 
+BASE_DICTIONARIES = ["MW", "MWE", "AP90", "AE"]
 ENGLISH_DICTIONARIES = ["MWE", "BOR", "AE"]
 
 ###############################################################################
@@ -57,7 +58,8 @@ class CDSLDict:
     name: str
     url: str = field(repr=False)
     db: str = field(repr=False, default=None)
-    english_keys: bool = field(repr=False, default=False)
+    transliterate_keys: bool = field(repr=False, default=True)
+    transliterate_data: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
 
@@ -195,17 +197,19 @@ class CDSLDict:
             else:
                 self._lexicon = lexicon_constructor(
                     self.id,
-                    english_keys=self.english_keys
+                    transliterate_keys=self.transliterate_keys,
+                    transliterate_data=self.transliterate_data
                 )
                 self._entry = entry_constructor(self.id)
 
         db_url = f"sqlite:///{self.db}"
         self._lexicon.bind(connect(db_url))
+        self.search.cache_clear()
+        self.stats.cache_clear()
 
     # ----------------------------------------------------------------------- #
 
-    @property
-    @lru_cache(maxsize=32)
+    @lru_cache(maxsize=1)
     def stats(self):
         lex = self._lexicon
         total_count = lex.select().count()
@@ -253,18 +257,7 @@ class CDSLDict:
         ]
 
     def entry(self, entry_id):
-        """Get an entry by ID
-
-        Parameters
-        ----------
-        entry_id : str
-            Entry ID
-
-        Returns
-        -------
-        object
-            Matching entry
-        """
+        """Get an entry by ID"""
         return self._entry(self._lexicon.get(self._lexicon.id == entry_id))
 
     def dump(self, output=None):
@@ -290,6 +283,8 @@ class CDSLDict:
 class CDSLCorpus:
     """CDSL Corpus"""
     data_dir: str = field(default=None)
+    transliterate_keys: bool = field(repr=False, default=True)
+    transliterate_data: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
 
@@ -313,10 +308,11 @@ class CDSLCorpus:
     # ----------------------------------------------------------------------- #
 
     def setup(self, dict_ids: list = None, update: bool = False):
-        """Download and setup CDSL dictionaries in bulk"""
+        """Setup CDSL dictionaries in bulk"""
         if dict_ids is None:
-            setup_dicts = self.available_dicts
-        elif isinstance(dict_ids, list):
+            dict_ids = BASE_DICTIONARIES
+
+        if isinstance(dict_ids, list):
             setup_dicts = {
                 dict_id: cdsl_dict
                 for dict_id, cdsl_dict in self.available_dicts.items()
@@ -354,14 +350,20 @@ class CDSLCorpus:
             dict_date = cells[1].get_text(" ").strip().split()[0]
             dict_name = cells[2].find("a").get_text(" ").strip()
             dict_download = f"{SERVER_URL}{dl_tag['href']}"
-            dict_english_keys = dict_id in ENGLISH_DICTIONARIES
+            dict_transliterate_keys = (
+                dict_id not in ENGLISH_DICTIONARIES
+                and
+                self.transliterate_keys
+            )
+            dict_transliterate_data = self.transliterate_data
 
             dictionaries[dict_id] = CDSLDict(
                 id=dict_id,
                 date=dict_date,
                 name=dict_name,
                 url=dict_download,
-                english_keys=dict_english_keys
+                transliterate_keys=dict_transliterate_keys,
+                transliterate_data=dict_transliterate_data
             )
         return dictionaries
 

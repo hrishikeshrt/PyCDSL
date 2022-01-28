@@ -9,7 +9,7 @@ Models for Lexicon Access
 ###############################################################################
 
 import re
-from functools import cached_property
+from functools import lru_cache
 
 from peewee import (DatabaseProxy, Model,
                     DecimalField, CharField, TextField)
@@ -28,23 +28,32 @@ EXTERNAL_SCHEME = sanscript.DEVANAGARI
 ###############################################################################
 
 
-def to_internal(matchobj_or_str, /):
+def to_internal(matchobj_or_str):
     if isinstance(matchobj_or_str, str):
         target = matchobj_or_str
+        start = ""
+        end = ""
     if isinstance(matchobj_or_str, re.Match):
-        target = matchobj_or_str.group()
+        target = matchobj_or_str.group(1)
+        start = r"<s>"
+        end = r"</s>"
 
-    return transliterate(target, EXTERNAL_SCHEME, INTERNAL_SCHEME)
+    replacement = transliterate(target, EXTERNAL_SCHEME, INTERNAL_SCHEME)
+    return f"{start}{replacement}{end}"
 
 
-def to_external(matchobj_or_str, /):
+def to_external(matchobj_or_str):
     if isinstance(matchobj_or_str, str):
         target = matchobj_or_str
+        start = ""
+        end = ""
     if isinstance(matchobj_or_str, re.Match):
-        target = matchobj_or_str.group()
+        target = matchobj_or_str.group(1)
+        start = r"<s>"
+        end = r"</s>"
 
-    return transliterate(target, INTERNAL_SCHEME, EXTERNAL_SCHEME)
-
+    replacement = transliterate(target, INTERNAL_SCHEME, EXTERNAL_SCHEME)
+    return f"{start}{replacement}{end}"
 
 ###############################################################################
 
@@ -73,8 +82,9 @@ class SanskritXMLField(TextField):
 ###############################################################################
 
 
-class Lexicon(Model):
-    """Basic Lexicon Model"""
+class BaseLexicon(Model):
+    """Base Lexicon Model without any transliteration"""
+    # Default scheme for most dictionaries is SLP1
     id = DecimalField(unique=True, decimal_places=2, db_column='lnum')
     key = CharField(index=True)
     data = TextField()
@@ -88,8 +98,8 @@ class Lexicon(Model):
 # --------------------------------------------------------------------------- #
 
 
-class EnglishLexicon(Model):
-    """Lexicon Model with English Keys"""
+class PlainKeysLexicon(Model):
+    """Lexicon model with non-transliterated keys"""
     id = DecimalField(unique=True, decimal_places=2, db_column='lnum')
     key = CharField(index=True)
     data = SanskritXMLField()
@@ -104,7 +114,7 @@ class EnglishLexicon(Model):
 
 
 class SanskritLexicon(Model):
-    """Lexicon Model with Sanskrit Keys"""
+    """Lexicon model with transliterated keys and data"""
     id = DecimalField(unique=True, decimal_places=2, db_column='lnum')
     key = SanskritCharField(index=True)
     data = SanskritXMLField()
@@ -119,7 +129,7 @@ class SanskritLexicon(Model):
 
 
 class Entry:
-    """Wrapper for Entry Model"""
+    """Wrapper for Lexicon Entry"""
     def __init__(self, entry):
         self.id = entry.id
         self.key = entry.key
@@ -129,7 +139,8 @@ class Entry:
         self._soup = bs4.BeautifulSoup(self.data, 'xml')
         self._body = self._soup.find('body')
 
-    @cached_property
+    @property
+    @lru_cache(maxsize=1)
     def meaning(self):
         return self._body.get_text().strip()
 
@@ -144,7 +155,12 @@ class Entry:
 ###############################################################################
 
 
-def lexicon_constructor(dict_id, table_name=None, english_keys=False):
+def lexicon_constructor(
+    dict_id,
+    table_name=None,
+    transliterate_keys=True,
+    transliterate_data=True
+):
     """Construct a Lexicon Model
 
     Parameters
@@ -155,9 +171,14 @@ def lexicon_constructor(dict_id, table_name=None, english_keys=False):
         Name of the table in SQLite database.
         If None, it will be inferred as dict_id.lower()
         The default is None.
-    english_keys : bool, optional
-        True if the lexicon has English keys instead of Sanskrit
-        The default is False.
+    transliterate_keys : bool, optional
+        If True, the keys in lexicon will be transliterated to Devanagari.
+        The default is True.
+    transliterate_data : bool, optional
+        If True, part of the data in lexicon that is enclosed in <s> tags
+        will be transliterated to Devanagari.
+        If False, the transliterate_keys option will be assumed to be False.
+        The default is True.
 
     Returns
     -------
@@ -168,8 +189,16 @@ def lexicon_constructor(dict_id, table_name=None, english_keys=False):
     class_dict = {
         "Meta": type("Meta", (), {'table_name': table_name})
     }
-    bases = (EnglishLexicon,) if english_keys else (SanskritLexicon,)
-    return type(f"{dict_id}Lexicon", bases, class_dict)
+    if not transliterate_data:
+        bases = (BaseLexicon,)
+        model_desc = "Base"
+    elif not transliterate_keys:
+        bases = (PlainKeysLexicon,)
+        model_desc = "PlainKeys"
+    else:
+        bases = (SanskritLexicon,)
+        model_desc = ""
+    return type(f"{dict_id}{model_desc}Lexicon", bases, class_dict)
 
 
 def entry_constructor(dict_id):
