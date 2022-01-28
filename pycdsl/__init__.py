@@ -7,7 +7,7 @@
 
 __author__ = "Hrishikesh Terdalkar"
 __email__ = 'hrishikeshrt@linuxmail.org'
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 ###############################################################################
 
