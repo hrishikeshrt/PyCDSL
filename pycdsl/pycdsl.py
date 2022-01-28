@@ -8,6 +8,7 @@ Download dictionaries from https://www.sanskrit-lexicon.uni-koeln.de/
 
 ###############################################################################
 
+import json
 from pathlib import Path
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -256,7 +257,7 @@ class CDSLDict:
 
         Parameters
         ----------
-        entry_id : Decimal
+        entry_id : str
             Entry ID
 
         Returns
@@ -265,6 +266,22 @@ class CDSLDict:
             Matching entry
         """
         return self._entry(self._lexicon.get(self._lexicon.id == entry_id))
+
+    def dump(self, output=None):
+        """Dump data as JSON"""
+        data = [{
+            "id": str(entry.id),
+            "key": entry.key,
+            "data": entry.data,
+            "text": entry.meaning
+        } for entry in (
+            self._entry(result) for result in self._lexicon.select()
+        )]
+        if output is not None:
+            with open(output, mode="w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False)
+        return data
+
 
 ###############################################################################
 
