@@ -43,12 +43,13 @@ class CDSLShell(BasicShell):
         super(self.__class__, self).__init__()
         self.debug = False
         self.schemes = [
-            sanscript.HK,
-            sanscript.VELTHUIS,
+            sanscript.DEVANAGARI,
+            sanscript.IAST,
             sanscript.ITRANS,
+            sanscript.VELTHUIS,
+            sanscript.HK,
             sanscript.SLP1,
             sanscript.WX,
-            sanscript.DEVANAGARI
         ]
         self.input_scheme = sanscript.DEVANAGARI
 
