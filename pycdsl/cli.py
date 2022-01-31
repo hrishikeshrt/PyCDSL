@@ -3,33 +3,13 @@
 import os
 import cmd
 import sys
+import logging
 
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
 from .pycdsl import CDSLCorpus
 from . import __version__
-
-###############################################################################
-
-DEFAULT_DICTIONARIES = [
-    # Sanskrit-English
-    # ----------------
-    "MW", "AP90",
-    # "WIL", "YAT", "GST", "MW72", "BEN", "LAN", "CAE", "MD", "SHS",
-
-    # English-Sanskrit
-    # ----------------
-    "MWE", "AE",  # "BOR",
-
-    # Sanskrit-Sanskrit
-    # -----------------
-    # "VCP", "SKD", "ARMH",
-
-    # Special
-    # ---------
-    # "INM", "MCI", "VEI" "PUI", "PE", "SNP",
-]
 
 ###############################################################################
 
@@ -73,9 +53,14 @@ class CDSLShell(BasicShell):
         self.input_scheme = sanscript.DEVANAGARI
 
         self.cdsl = CDSLCorpus(data_dir=data_dir)
-        self.dict_ids = dict_ids or DEFAULT_DICTIONARIES
+        self.dict_ids = dict_ids
         self.active = None
-        self.dict = None
+
+        # Logging
+        self.logger = logging.getLogger()  # root logger
+        if not self.logger.hasHandlers():
+            self.logger.addHandler(logging.StreamHandler())
+        self.logger.setLevel(logging.INFO)
 
     # ----------------------------------------------------------------------- #
     # Debug Mode
@@ -84,8 +69,10 @@ class CDSLShell(BasicShell):
         """Turn debug mode on/off"""
         if arg.lower() in ["true", "on", "yes"]:
             self.debug = True
+            self.logger.setLevel(logging.DEBUG)
         if arg.lower() in ["false", "off", "no"]:
             self.debug = False
+            self.logger.setLevel(logging.INFO)
         print(f"Debug: {self.debug}")
 
     # ----------------------------------------------------------------------- #
@@ -106,16 +93,28 @@ class CDSLShell(BasicShell):
                 print(f"Input scheme: {self.input_scheme}")
 
     # ----------------------------------------------------------------------- #
+    # Dictionary Information
 
-    def do_available(self, dict_id):
-        """Display available lexicons"""
+    def do_info(self, text=None):
+        if self.active is None:
+            self.logger.error("Please select a dictionary first.")
+        else:
+            print(self.active)
+
+    def do_dicts(self, text=None):
+        """Display a list of lexicon available locally"""
+        for _, cdsl_dict in self.cdsl.dicts.items():
+            print(cdsl_dict)
+
+    def do_available(self, text=None):
+        """Display lexicons available in CDSL"""
         for _, cdsl_dict in self.cdsl.available_dicts.items():
             print(cdsl_dict)
 
     # ----------------------------------------------------------------------- #
 
     def do_update(self, text):
-        """Update downloaded dictionaries"""
+        """Update loaded dictionaries"""
         self.cdsl.setup(list(self.cdsl.dicts), update=True)
 
     # ----------------------------------------------------------------------- #
@@ -132,38 +131,38 @@ class CDSLShell(BasicShell):
         dict_id = dict_id.upper()
         status = (dict_id in self.cdsl.dicts) or self.cdsl.setup([dict_id])
         if status:
-            self.active = dict_id
-            self.prompt = f"(CDSL::{self.active}) "
-            self.dict = self.cdsl.dicts[dict_id]
+            self.active = self.cdsl.dicts[dict_id]
+            self.prompt = f"(CDSL::{self.active.id}) "
         else:
-            print(f"Couldn't setup dictionary '{dict_id}'.")
+            self.logger.error(f"Couldn't setup dictionary '{dict_id}'.")
 
     # ----------------------------------------------------------------------- #
 
     def do_show(self, entry_id):
         """Show a specific entry by ID"""
-        if self.dict is None:
-            print("Please select a dictionary first.")
+        if self.active is None:
+            self.logger.error("Please select a dictionary first.")
         else:
-            result = self.dict.entry(entry_id)
+            result = self.active.entry(entry_id)
             print(result)
-            print(f"Raw: {result.data}")
+            self.logger.debug(f"Data: {result.data}")
 
     # ----------------------------------------------------------------------- #
 
     def do_version(self, text):
+        """Version of the PyCDSL"""
         print(__version__)
 
     # ----------------------------------------------------------------------- #
 
     def default(self, line):
-        if self.dict is None:
-            print("Please select a dictionary first.")
+        if self.active is None:
+            self.logger.error("Please select a dictionary first.")
         else:
             search_key = transliterate(
                 line, self.input_scheme, sanscript.DEVANAGARI
-            ) if self.dict.transliterate_keys else line
-            results = self.dict.search(search_key)[:50]
+            ) if self.active.transliterate_keys else line
+            results = self.active.search(search_key)[:50]
             for result in results:
                 print(result)
 
@@ -171,12 +170,18 @@ class CDSLShell(BasicShell):
         print(self.intro)
         print(self.desc)
         self.cdsl.setup(dict_ids=self.dict_ids)
+
+        print(f"Loaded {len(self.cdsl.dicts)} dictionaries.")
+
         while True:
             try:
                 super(self.__class__, self).cmdloop(intro="")
                 break
             except KeyboardInterrupt:
                 print("\nKeyboardInterrupt")
+
+
+###############################################################################
 
 
 def main():

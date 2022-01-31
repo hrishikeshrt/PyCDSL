@@ -9,6 +9,7 @@ Download dictionaries from https://www.sanskrit-lexicon.uni-koeln.de/
 ###############################################################################
 
 import json
+import logging
 from pathlib import Path
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -29,6 +30,10 @@ from .models import (
 
 ###############################################################################
 
+LOGGER = logging.getLogger(__name__)
+
+###############################################################################
+
 SERVER_URL = "https://www.sanskrit-lexicon.uni-koeln.de"
 
 ###############################################################################
@@ -39,7 +44,25 @@ DICTIONARIES = {
     "AP90": (AP90Lexicon, AP90Entry),
 }
 
-BASE_DICTIONARIES = ["MW", "MWE", "AP90", "AE"]
+DEFAULT_DICTIONARIES = [
+    # Sanskrit-English
+    # ----------------
+    "MW", "AP90",
+    # "WIL", "YAT", "GST", "MW72", "BEN", "LAN", "CAE", "MD", "SHS",
+
+    # English-Sanskrit
+    # ----------------
+    "MWE", "AE",  # "BOR",
+
+    # Sanskrit-Sanskrit
+    # -----------------
+    # "VCP", "SKD", "ARMH",
+
+    # Special
+    # ---------
+    # "INM", "MCI", "VEI" "PUI", "PE", "SNP",
+]
+
 ENGLISH_DICTIONARIES = ["MWE", "BOR", "AE"]
 
 ###############################################################################
@@ -83,11 +106,12 @@ class CDSLDict:
         soup = bs4.BeautifulSoup(html, "html.parser")
         footer = soup.find("div", attrs={"id": "footer"})
         last_modified = footer.find("p").get_text().split(":", 1)[-1].strip()
+        LOGGER.debug(f"{last_modified=}")
 
         download_dir = Path(download_dir)
+        download_dir.mkdir(parents=True, exist_ok=True)
 
         last_modified_file = download_dir / "last_modified.txt"
-        download_dir.mkdir(parents=True, exist_ok=True)
 
         if last_modified_file.exists():
             local_last_modified = last_modified_file.read_text().strip()
@@ -107,7 +131,7 @@ class CDSLDict:
                 if "Directory 'web' containing displays" in li.get_text():
                     break
             else:
-                print("No download link for 'web' displays was found.")
+                LOGGER.error("No download link for 'web' displays was found.")
                 return False
 
             web_url = li.find("a")["href"]
@@ -118,9 +142,9 @@ class CDSLDict:
 
             if not success:
                 # download failed - restore backup
-                print("Something went wrong.")
+                LOGGER.error("Something went wrong.")
                 if backup_path.exists():
-                    print("Restoring ..")
+                    LOGGER.debug("Restoring ..")
                     backup_path.rename(download_path)
                 return False
 
@@ -135,7 +159,7 @@ class CDSLDict:
             with zipfile.ZipFile(download_path, "r") as zipref:
                 zipref.extractall(download_dir)
         else:
-            print(f"Dictionary data for '{self.id}' is already up-to-date.")
+            LOGGER.info(f"Data for dictionary '{self.id}' is up-to-date.")
         return True
 
     def setup(self, data_dir, symlink_dir=None, update=False):
@@ -171,7 +195,7 @@ class CDSLDict:
             self.download(download_dir=data_dir)
         )
         if not status:
-            print(f"Couldn't setup dictionary '{self.id}'.")
+            LOGGER.error(f"Couldn't setup dictionary '{self.id}'.")
             return False
 
         # create symlink
@@ -188,6 +212,7 @@ class CDSLDict:
     # ----------------------------------------------------------------------- #
 
     def connect(self, lexicon_model=None, entry_model=None):
+        """Connect to the SQLite database"""
         if lexicon_model is not None and entry_model is not None:
             self._lexicon = lexicon_model
             self._entry = entry_model
@@ -297,12 +322,13 @@ class CDSLCorpus:
         self.dict_dir = self.data_dir / "dict"
         self.db_dir = self.data_dir / "db"
         self.dicts = {}
-        self.available_dicts = self.get_available_dicts()
+        self.get_available_dicts()
 
     def __getattr__(self, attr: str):
         if attr in self.dicts:
             return self.dicts[attr]
         else:
+            LOGGER.exception(f"Invalid attribute {attr}")
             raise AttributeError
 
     # ----------------------------------------------------------------------- #
@@ -310,9 +336,10 @@ class CDSLCorpus:
     def setup(self, dict_ids: list = None, update: bool = False):
         """Setup CDSL dictionaries in bulk"""
         if dict_ids is None:
-            dict_ids = BASE_DICTIONARIES
+            dict_ids = DEFAULT_DICTIONARIES + list(self.get_installed_dicts())
 
         if isinstance(dict_ids, list):
+            dict_ids = set(dict_ids)
             setup_dicts = {
                 dict_id: cdsl_dict
                 for dict_id, cdsl_dict in self.available_dicts.items()
@@ -323,7 +350,7 @@ class CDSLCorpus:
 
         status = []
         for dict_id, cdsl_dict in setup_dicts.items():
-            dict_dir = self.dict_dir / dict_id
+            dict_dir = self.dict_dir / dict_id.upper()
             success = cdsl_dict.setup(
                 data_dir=dict_dir,
                 symlink_dir=self.db_dir,
@@ -335,6 +362,8 @@ class CDSLCorpus:
                 self.dicts[dict_id] = cdsl_dict
 
         return bool(status) and all(status)
+
+    # ----------------------------------------------------------------------- #
 
     def get_available_dicts(self):
         """Fetch a list of dictionaries available for download from CDSL"""
@@ -365,7 +394,25 @@ class CDSLCorpus:
                 transliterate_keys=dict_transliterate_keys,
                 transliterate_data=dict_transliterate_data
             )
+
+        self.available_dicts = dictionaries
         return dictionaries
 
+    # ----------------------------------------------------------------------- #
+
+    def get_installed_dicts(self):
+        dictionaries = {}
+        dict_ids = [path.name for path in self.dict_dir.glob("*")]
+        for dict_id in dict_ids:
+            if dict_id not in self.available_dicts:
+                LOGGER.error(f"Invalid dictionary '{dict_id}'")
+                continue
+
+            db_filename = f"{dict_id.lower()}.sqlite"
+            db_path = self.dict_dir / dict_id / "web" / "sqlite" / db_filename
+            if db_path.is_file():
+                dictionaries[dict_id] = self.available_dicts[dict_id]
+
+        return dictionaries
 
 ###############################################################################
