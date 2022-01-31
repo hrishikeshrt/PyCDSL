@@ -17,7 +17,7 @@ Python Interface to Cologne Digital Sanskrit Lexicon (CDSL)
 
 
 Access various dictionaries from CDSL (Cologne Digital Sanskrit Lexicon)
-
+https://www.sanskrit-lexicon.uni-koeln.de/
 
 * Free software: GNU General Public License v3
 * Documentation: https://pycdsl.readthedocs.io.
@@ -26,9 +26,9 @@ Access various dictionaries from CDSL (Cologne Digital Sanskrit Lexicon)
 Features
 --------
 
-* CDSL corpus management tool
-* Unified interface to access all dictionaries available at CDSL
-* REPL interface for easy dictionary search
+* CDSL Corpus Management (Download, Update, Access)
+* Unified Programmable Interface to access all dictionaries available at CDSL
+* REPL Interface for easy dictionary search
 
 Credits
 -------
