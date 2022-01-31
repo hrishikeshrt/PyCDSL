@@ -106,7 +106,7 @@ class CDSLDict:
         soup = bs4.BeautifulSoup(html, "html.parser")
         footer = soup.find("div", attrs={"id": "footer"})
         last_modified = footer.find("p").get_text().split(":", 1)[-1].strip()
-        LOGGER.debug(f"{last_modified=}")
+        LOGGER.debug(f"Last modified at {last_modified}")
 
         download_dir = Path(download_dir)
         download_dir.mkdir(parents=True, exist_ok=True)
