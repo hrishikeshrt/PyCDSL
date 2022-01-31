@@ -401,6 +401,7 @@ class CDSLCorpus:
     # ----------------------------------------------------------------------- #
 
     def get_installed_dicts(self):
+        """Fetch a list of dictionaries installed locally"""
         dictionaries = {}
         dict_ids = [path.name for path in self.dict_dir.glob("*")]
         for dict_id in dict_ids:

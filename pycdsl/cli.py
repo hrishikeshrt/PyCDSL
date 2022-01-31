@@ -96,6 +96,7 @@ class CDSLShell(BasicShell):
     # Dictionary Information
 
     def do_info(self, text=None):
+        """Display information about the active dictionary"""
         if self.active is None:
             self.logger.error("Please select a dictionary first.")
         else:
@@ -150,7 +151,7 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
 
     def do_version(self, text):
-        """Version of the PyCDSL"""
+        """Show the current version of PyCDSL"""
         print(__version__)
 
     # ----------------------------------------------------------------------- #
