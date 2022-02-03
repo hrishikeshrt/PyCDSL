@@ -306,7 +306,11 @@ class CDSLDict:
 
 @dataclass
 class CDSLCorpus:
-    """CDSL Corpus"""
+    """
+    CDSL Corpus Class
+
+    Refers to a CDSL installation instance at the location `data_dir`.
+    """
     data_dir: str = field(default=None)
     transliterate_keys: bool = field(repr=False, default=True)
     transliterate_data: bool = field(repr=False, default=True)
@@ -334,7 +338,35 @@ class CDSLCorpus:
     # ----------------------------------------------------------------------- #
 
     def setup(self, dict_ids: list = None, update: bool = False):
-        """Setup CDSL dictionaries in bulk"""
+        """Setup CDSL dictionaries in bulk
+
+        Calls `CDSLDict.setup()` on every `CDSLDict`, and if successful, also
+        calls `CDSLDict.connect()` to establish a connection to the database
+
+        Parameters
+        ----------
+        dict_ids : list, optional
+            List of dictionary IDs to setup.
+            If `None`, the dictionaries from `DEFAULT_DICTIONARIES` as well as
+            locally installed dictionaries will be setup.
+            The default is None.
+        update : bool, optional
+            If True, and update check is performed for every dictionary in
+            `dict_ids`, and if available, the updated version is installed
+            The default is False.
+
+        Returns
+        -------
+        bool
+            True, if the setup of all the dictionaries from `dict_ids`
+            is successful.
+            i.e. If every `CDSLDict.setup()` call returns True.
+
+        Raises
+        ------
+        ValueError
+            If `dict_ids` is not a `list` or `None`.
+        """
         if dict_ids is None:
             dict_ids = DEFAULT_DICTIONARIES + list(self.get_installed_dicts())
 
@@ -366,7 +398,12 @@ class CDSLCorpus:
     # ----------------------------------------------------------------------- #
 
     def get_available_dicts(self):
-        """Fetch a list of dictionaries available for download from CDSL"""
+        """
+        Fetch a list of dictionaries available for download from CDSL
+
+        Homepage of CDSL Project (`SERVER_URL`) is fetched and parsed to obtain
+        this list.
+        """
         html = requests.get(SERVER_URL).content.decode()
         soup = bs4.BeautifulSoup(html, "html.parser")
         dl_tags = soup.find_all("a", attrs={"title": "Downloads"})
