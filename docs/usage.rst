@@ -6,9 +6,22 @@ To use Python Interface to Cologne Digital Sanskrit Lexicon (CDSL) in a project:
 
     import pycdsl
 
+    # Create a CDSLCorpus Instance
+    # Default installation at ~/cdsl_data
+    # Custom installation path can be pased to the instantiation
     CDSL = pycdsl.CDSLCorpus()
+
+    # Setup default dictionaries (MW, MWE, AP90, AE)
+    # If any additional dictionaries are installed, they will be loaded as well
     CDSL.setup()
 
+    # For loading specific dictionaries only,
+    # a list of dictionary IDs can be passed to the setup function
+    # e.g. CDSL.setup(["VCP"])
+
+    # Search in a dictionary
+    # Any loaded dictionary will be accessible like an attribute
+    # e.g. CDSL.MW, CDSL.MWE etc.
     results = CDSL.MW.search("राम")
 
 
