@@ -6,14 +6,25 @@ PyCDSL
 .. image:: https://img.shields.io/pypi/v/PyCDSL?color=success
         :target: https://pypi.python.org/pypi/PyCDSL
 
-.. image:: https://img.shields.io/travis/hrishikeshrt/pycdsl.svg
-        :target: https://travis-ci.com/hrishikeshrt/pycdsl
-
 .. image:: https://readthedocs.org/projects/pycdsl/badge/?version=latest
         :target: https://pycdsl.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
+.. image:: https://img.shields.io/pypi/pyversions/PyCDSL
+        :target: https://pypi.python.org/pypi/PyCDSL
+        :alt: Python Version Support
 
+.. image:: https://img.shields.io/github/issues/hrishikeshrt/PyCDSL
+        :target: https://github.com/hrishikeshrt
+        :alt: GitHub Issues
+
+.. image:: https://img.shields.io/github/followers/hrishikeshrt?style=social
+        :target: https://github.com/hrishikeshrt
+        :alt: GitHub Followers
+
+.. image:: https://img.shields.io/twitter/follow/hrishikeshrt?style=social
+        :target: https://twitter.com/hrishikeshrt
+        :alt: Twitter Followers
 
 PyCDSL is a python interface to Cologne Digital Sanskrit Lexicon (CDSL)
 https://www.sanskrit-lexicon.uni-koeln.de/

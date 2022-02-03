@@ -1,5 +1,7 @@
-Welcome to Python Interface to Cologne Digital Sanskrit Lexicon (CDSL)'s documentation!
-=======================================================================================
+Welcome to PyCDSL's documentation!
+==================================
+
+Python Interface to Cologne Digital Sanskrit Lexicon (CDSL)
 
 .. toctree::
    :maxdepth: 2
