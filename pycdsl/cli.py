@@ -34,9 +34,12 @@ class BasicShell(cmd.Cmd):
 
 
 class CDSLShell(BasicShell):
-    intro = "Cologne Sanskrit Digital Lexicon (CDSL)"
-    desc = "Type any keyword to search in the selected lexicon." \
-           " (help or ? for list of options)"
+    intro = "Cologne Sanskrit Digital Lexicon (CDSL)\n" \
+            "---------------------------------------"
+    desc = "Install or load a lexicon by typing `use <DICT_ID>` " \
+           "e.g. `use MW`.\n" \
+           "Type any keyword to search in the selected lexicon. " \
+           "(help or ? for list of options)"
     prompt = "(CDSL::None) "
 
     def __init__(self, data_dir=None, dict_ids=None):
@@ -129,7 +132,7 @@ class CDSLShell(BasicShell):
         ]
 
     def do_use(self, dict_id):
-        """Use a specific lexicon"""
+        """Install/Load a specific lexicon from CDSL."""
         dict_id = dict_id.upper()
         status = (dict_id in self.cdsl.dicts) or self.cdsl.setup([dict_id])
         if status:
