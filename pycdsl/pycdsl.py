@@ -22,10 +22,14 @@ import bs4
 import requests
 from requests_downloader import downloader
 
+from indic_transliteration.sanscript import transliterate
+
+from .utils import validate_scheme
 from .models import (
     MWLexicon, MWEntry,
     AP90Lexicon, AP90Entry,
-    lexicon_constructor, entry_constructor
+    lexicon_constructor, entry_constructor,
+    INTERNAL_SCHEME, DEFAULT_SCHEME
 )
 
 ###############################################################################
@@ -37,7 +41,6 @@ LOGGER = logging.getLogger(__name__)
 SERVER_URL = "https://www.sanskrit-lexicon.uni-koeln.de"
 
 ###############################################################################
-
 
 DICTIONARIES = {
     "MW": (MWLexicon, MWEntry),
@@ -81,8 +84,8 @@ class CDSLDict:
     name: str
     url: str = field(repr=False)
     db: str = field(repr=False, default=None)
+    scheme: str = field(default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
-    transliterate_data: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
 
@@ -211,6 +214,28 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
+    def set_scheme(self, scheme, transliterate_keys=True):
+        """Set transliteration scheme for the dictionary instance
+
+        Parameters
+        ----------
+        scheme : str, optional
+            Output transliteration scheme.
+        transliterate_keys : bool, optional
+            Determines whether the keys in lexicon should be transliterated
+            to `scheme` or not.
+            The default is True.
+        """
+        if scheme is not None and not validate_scheme(scheme):
+            LOGGER.warning(f"Invalid transliteration scheme '{scheme}'.")
+        else:
+            self.scheme = scheme
+            self.transliterate_keys = transliterate_keys
+            self.search.cache_clear()
+            self.stats.cache_clear()
+
+    # ----------------------------------------------------------------------- #
+
     def connect(self, lexicon_model=None, entry_model=None):
         """Connect to the SQLite database"""
         if lexicon_model is not None and entry_model is not None:
@@ -220,11 +245,7 @@ class CDSLDict:
             if self.id in DICTIONARIES:
                 self._lexicon, self._entry = DICTIONARIES[self.id]
             else:
-                self._lexicon = lexicon_constructor(
-                    self.id,
-                    transliterate_keys=self.transliterate_keys,
-                    transliterate_data=self.transliterate_data
-                )
+                self._lexicon = lexicon_constructor(self.id)
                 self._entry = entry_constructor(self.id)
 
         db_url = f"sqlite:///{self.db}"
@@ -236,6 +257,7 @@ class CDSLDict:
 
     @lru_cache(maxsize=1)
     def stats(self):
+        """Display statistics about the lexicon"""
         lex = self._lexicon
         total_count = lex.select().count()
         distinct_query = (
@@ -273,17 +295,30 @@ class CDSLDict:
         list
             List of matching entries
         """
+        if self.scheme:
+            search_key = transliterate(
+                search_key, self.scheme, INTERNAL_SCHEME
+            )
+
         query = self._lexicon.select().where(self._lexicon.key % search_key)
         iquery = self._lexicon.select().where(self._lexicon.key ** search_key)
         search_query = iquery if ignore_case else query
         return [
-            self._entry(result)
+            self._entry(
+                result,
+                scheme=self.scheme,
+                transliterate_keys=self.transliterate_keys
+            )
             for result in search_query
         ]
 
     def entry(self, entry_id):
         """Get an entry by ID"""
-        return self._entry(self._lexicon.get(self._lexicon.id == entry_id))
+        return self._entry(
+            self._lexicon.get(self._lexicon.id == entry_id),
+            scheme=self.scheme,
+            transliterate_keys=self.transliterate_keys
+        )
 
     def dump(self, output=None):
         """Dump data as JSON"""
@@ -291,7 +326,7 @@ class CDSLDict:
             "id": str(entry.id),
             "key": entry.key,
             "data": entry.data,
-            "text": entry.meaning
+            "text": entry.meaning()
         } for entry in (
             self._entry(result) for result in self._lexicon.select()
         )]
@@ -312,8 +347,8 @@ class CDSLCorpus:
     Refers to a CDSL installation instance at the location `data_dir`.
     """
     data_dir: str = field(default=None)
+    scheme: str = field(default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
-    transliterate_data: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
 
@@ -421,15 +456,14 @@ class CDSLCorpus:
                 and
                 self.transliterate_keys
             )
-            dict_transliterate_data = self.transliterate_data
 
             dictionaries[dict_id] = CDSLDict(
                 id=dict_id,
                 date=dict_date,
                 name=dict_name,
                 url=dict_download,
-                transliterate_keys=dict_transliterate_keys,
-                transliterate_data=dict_transliterate_data
+                scheme=self.scheme,
+                transliterate_keys=dict_transliterate_keys
             )
 
         self.available_dicts = dictionaries
