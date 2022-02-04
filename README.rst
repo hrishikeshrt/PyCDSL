@@ -26,6 +26,7 @@ PyCDSL
         :target: https://twitter.com/hrishikeshrt
         :alt: Twitter Followers
 
+
 PyCDSL is a python interface to Cologne Digital Sanskrit Lexicon (CDSL)
 https://www.sanskrit-lexicon.uni-koeln.de/
 
@@ -61,12 +62,18 @@ To use PyCDSL in a project::
 Create a CDSLCorpus Instance::
 
     # Default installation at ~/cdsl_data
-    # Custom installation path can be pased to the instantiation
     CDSL = pycdsl.CDSLCorpus()
 
-Setup default dictionaries (MW, MWE, AP90, AE)::
+    # Custom installation path can be specified with argument `data_dir`
+    # e.g. CDSL = pycdsl.CDSLCorpus(data_dir='custom-installation-path')
 
-    # If any additional dictionaries are installed, they will be loaded as well
+    # Custom transliteration scheme can be specified with argument `scheme`
+    # `scheme` is a valid name of the scheme from `indic-transliteration`
+    CDSL = pycdsl.CDSLCorpus(scheme='itrans')
+
+Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`)::
+
+    # Note: Any additional dictionaries that are installed will also be loaded.
     CDSL.setup()
 
     # For loading specific dictionaries only,
@@ -90,6 +97,15 @@ Access an entry by ID::
     # >>> entry
     # <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
+Transliterate a single entry::
+
+    # >>> entry.transliterate('slp1')
+    # <MWEntry: 263938: hfzIkeSa = lord of the senses (said of Manas), BhP.>
+
+Change transliteration scheme for a dictionary::
+
+    CDSL.MW.set_scheme("itrans")
+    CDSL.MW.search("rAma")
 
 Using REPL Interface of PyCDSL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -98,7 +114,7 @@ To use REPL Interface to Cologne Digital Sanskrit Lexicon (CDSL)::
 
     $ cdsl
 
-Example of a :code:`cdsl` REPL Session::
+Example of a REPL Session::
 
     Cologne Sanskrit Digital Lexicon (CDSL)
     ---------------------------------------
@@ -110,11 +126,20 @@ Example of a :code:`cdsl` REPL Session::
 
     Documented commands (type help <topic>):
     ========================================
-    EOF        debug  exit  info    shell  update  version
-    available  dicts  help  scheme  show   use
+    EOF        debug  exit  info          output_scheme  show    use
+    available  dicts  help  input_scheme  shell          update  version
 
     (CDSL::None) help available
     Display lexicons available in CDSL
+
+    (CDSL::None) help dicts
+    Display a list of lexicon available locally
+
+    (CDSL::None) dicts
+    CDSLDict(id='AP90', date='1890', name='Apte Practical Sanskrit-English Dictionary')
+    CDSLDict(id='MW', date='1899', name='Monier-Williams Sanskrit-English Dictionary')
+    CDSLDict(id='MWE', date='1851', name='Monier-Williams English-Sanskrit Dictionary')
+    CDSLDict(id='AE', date='1920', name="Apte Student's English-Sanskrit Dictionary")
 
     (CDSL::None) update
     Data for dictionary 'AP90' is up-to-date.
@@ -136,7 +161,7 @@ Example of a :code:`cdsl` REPL Session::
 
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
-    (CDSL::MW) scheme itrans
+    (CDSL::MW) input_scheme itrans
 
     Input scheme: itrans
 
@@ -148,6 +173,19 @@ Example of a :code:`cdsl` REPL Session::
     <MWEntry: 263936: हृषीकेश = of a Tīrtha, Cat.>
     <MWEntry: 263937: हृषीकेश = of a poet, ib.>
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
+
+    (CDSL::MW) output_scheme iast
+
+    Output scheme: iast
+
+    (CDSL::MW) hRRiSIkesha
+
+    <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
+    <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
+    <MWEntry: 263935: hṛṣīkeśa = N. of the tenth month, VarBṛS.>
+    <MWEntry: 263936: hṛṣīkeśa = of a Tīrtha, Cat.>
+    <MWEntry: 263937: hṛṣīkeśa = of a poet, ib.>
+    <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
 
     (CDSL::MW) info
 
