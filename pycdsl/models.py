@@ -33,7 +33,7 @@ def to_internal(matchobj_or_str):
         target = matchobj_or_str
         start = ""
         end = ""
-    if isinstance(matchobj_or_str, re.Match):
+    if isinstance(matchobj_or_str, re.Match) or isinstance(matchobj_or_str, _sre.SRE_Match):
         target = matchobj_or_str.group(1)
         start = r"<s>"
         end = r"</s>"
