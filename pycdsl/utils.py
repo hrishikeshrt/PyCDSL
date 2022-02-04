@@ -6,9 +6,14 @@ Utility Functions
 
 import re
 
-from indic_transliteration.sanscript import transliterate
+from indic_transliteration.sanscript import SCHEMES, transliterate
 
 ###############################################################################
+
+
+def validate_scheme(scheme):
+    """Validate the name of transliteration scheme"""
+    return scheme in SCHEMES
 
 
 def transliterate_between(
@@ -37,6 +42,9 @@ def transliterate_between(
     end_pattern : regexp
         Pattern describing the end tag
     """
+
+    if from_scheme == to_scheme:
+        return text
 
     def transliterate_match(matchobj):
         target = matchobj.group(1)
