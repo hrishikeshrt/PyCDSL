@@ -84,7 +84,7 @@ class CDSLDict:
     name: str
     url: str = field(repr=False)
     db: str = field(repr=False, default=None)
-    scheme: str = field(default=DEFAULT_SCHEME)
+    scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
@@ -366,7 +366,7 @@ class CDSLCorpus:
     Refers to a CDSL installation instance at the location `data_dir`.
     """
     data_dir: str = field(default=None)
-    scheme: str = field(default=DEFAULT_SCHEME)
+    scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
