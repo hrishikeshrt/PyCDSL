@@ -8,7 +8,7 @@ import logging
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
-from .pycdsl import CDSLCorpus
+from .pycdsl import CDSLCorpus, INTERNAL_SCHEME, DEFAULT_SCHEME
 from . import __version__
 
 ###############################################################################
@@ -56,7 +56,10 @@ class CDSLShell(BasicShell):
         ]
         self.input_scheme = sanscript.DEVANAGARI
 
-        self.cdsl = CDSLCorpus(data_dir=data_dir)
+        self.input_scheme = DEFAULT_SCHEME
+        self.output_scheme = DEFAULT_SCHEME
+
+        self.cdsl = CDSLCorpus(data_dir=data_dir, scheme=None)
         self.dict_ids = dict_ids
         self.active = None
 
@@ -80,12 +83,15 @@ class CDSLShell(BasicShell):
         print(f"Debug: {self.debug}")
 
     # ----------------------------------------------------------------------- #
-    # Input Transliteration Scheme
+    # Input/Output Transliteration Scheme
 
-    def complete_scheme(self, text, line, begidx, endidx):
+    def complete_input_scheme(self, text, line, begidx, endidx):
         return [sch for sch in self.schemes if sch.startswith(text)]
 
-    def do_scheme(self, scheme):
+    def complete_output_scheme(self, text, line, begidx, endidx):
+        return [sch for sch in self.schemes if sch.startswith(text)]
+
+    def do_input_scheme(self, scheme):
         """Change the input transliteration scheme"""
         if not scheme:
             print(f"Input scheme: {self.input_scheme}")
@@ -95,6 +101,17 @@ class CDSLShell(BasicShell):
             else:
                 self.input_scheme = scheme
                 print(f"Input scheme: {self.input_scheme}")
+
+    def do_output_scheme(self, scheme):
+        """Change the output transliteration scheme"""
+        if not scheme:
+            print(f"Input scheme: {self.output_scheme}")
+        else:
+            if scheme not in self.schemes:
+                print(f"Invalid scheme. (valid schemes are {self.schemes}")
+            else:
+                self.output_scheme = scheme
+                print(f"Output scheme: {self.output_scheme}")
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
@@ -149,7 +166,12 @@ class CDSLShell(BasicShell):
             self.logger.error("Please select a dictionary first.")
         else:
             result = self.active.entry(entry_id)
-            print(result)
+            print(
+                result.transliterate(
+                    scheme=self.output_scheme,
+                    transliterate_key=self.active.transliterate_keys
+                )
+            )
             self.logger.debug(f"Data: {result.data}")
 
     # ----------------------------------------------------------------------- #
@@ -165,11 +187,16 @@ class CDSLShell(BasicShell):
             self.logger.error("Please select a dictionary first.")
         else:
             search_key = transliterate(
-                line, self.input_scheme, sanscript.DEVANAGARI
+                line, self.input_scheme, INTERNAL_SCHEME
             ) if self.active.transliterate_keys else line
             results = self.active.search(search_key)[:50]
             for result in results:
-                print(result)
+                print(
+                    result.transliterate(
+                        scheme=self.output_scheme,
+                        transliterate_keys=self.active.transliterate_keys
+                    )
+                )
 
     def cmdloop(self, intro=None):
         print(self.intro)
