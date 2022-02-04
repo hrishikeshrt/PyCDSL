@@ -320,18 +320,37 @@ class CDSLDict:
             transliterate_keys=self.transliterate_keys
         )
 
-    def dump(self, output=None):
-        """Dump data as JSON"""
+    def dump(self, output_path=None):
+        """
+        Dump data as JSON
+
+        Parameters
+        ----------
+        output_path : str or None, optional
+            Path to the output JSON file.
+            If None, the data isn't written to the disk, only returned.
+            The default is None.
+
+        Returns
+        -------
+        list
+            List of all the entries in the dictionary. Every entry is a `dict`.
+            If `output_path` is provided, the same list is written as JSON.
+        """
         data = [{
             "id": str(entry.id),
             "key": entry.key,
             "data": entry.data,
             "text": entry.meaning()
         } for entry in (
-            self._entry(result) for result in self._lexicon.select()
+            self._entry(
+                result,
+                scheme=self.scheme,
+                transliterate_keys=self.transliterate_keys
+            ) for result in self._lexicon.select()
         )]
-        if output is not None:
-            with open(output, mode="w", encoding="utf-8") as f:
+        if output_path is not None:
+            with open(output_path, mode="w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False)
         return data
 
@@ -367,7 +386,6 @@ class CDSLCorpus:
         if attr in self.dicts:
             return self.dicts[attr]
         else:
-            LOGGER.exception(f"Invalid attribute {attr}")
             raise AttributeError
 
     # ----------------------------------------------------------------------- #
