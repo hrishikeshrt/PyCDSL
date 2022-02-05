@@ -169,7 +169,7 @@ class CDSLShell(BasicShell):
             print(
                 result.transliterate(
                     scheme=self.output_scheme,
-                    transliterate_key=self.active.transliterate_keys
+                    transliterate_keys=self.active.transliterate_keys
                 )
             )
             self.logger.debug(f"Data: {result.data}")
