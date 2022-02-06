@@ -226,13 +226,10 @@ class CDSLDict:
             to `scheme` or not.
             The default is True.
         """
-        if scheme is not None and not validate_scheme(scheme):
-            LOGGER.warning(f"Invalid transliteration scheme '{scheme}'.")
-        else:
-            self.scheme = scheme
-            self.transliterate_keys = transliterate_keys
-            self.search.cache_clear()
-            self.stats.cache_clear()
+        self.scheme = validate_scheme(scheme)
+        self.transliterate_keys = transliterate_keys
+        self.search.cache_clear()
+        self.stats.cache_clear()
 
     # ----------------------------------------------------------------------- #
 

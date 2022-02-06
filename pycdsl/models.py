@@ -78,18 +78,13 @@ class Entry:
         self.data = self._entry.data
 
         # Validate Scheme
-        if scheme is None:
-            scheme = INTERNAL_SCHEME
-
-        scheme_is_valid = validate_scheme(scheme)
-        if not scheme_is_valid:
-            LOGGER.warning(f"Invalid transliteration scheme '{scheme}'.")
+        valid_scheme = validate_scheme(scheme) or INTERNAL_SCHEME
 
         # Transliterate
-        if scheme_is_valid and scheme != INTERNAL_SCHEME:
+        if valid_scheme != INTERNAL_SCHEME:
             if transliterate_keys:
                 self.key = sanscript.transliterate(
-                    self._entry.key, INTERNAL_SCHEME, scheme
+                    self._entry.key, INTERNAL_SCHEME, valid_scheme
                 )
             else:
                 self.key = self._entry.key
@@ -97,7 +92,7 @@ class Entry:
             self.data = transliterate_between(
                 self._entry.data,
                 from_scheme=INTERNAL_SCHEME,
-                to_scheme=scheme,
+                to_scheme=valid_scheme,
                 start_pattern=r"<s>",
                 end_pattern=r"</s>"
             )

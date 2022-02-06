@@ -5,15 +5,37 @@ Utility Functions
 """
 
 import re
+import logging
 
 from indic_transliteration.sanscript import SCHEMES, transliterate
 
 ###############################################################################
 
+LOGGER = logging.getLogger(__name__)
+
+###############################################################################
+
 
 def validate_scheme(scheme):
-    """Validate the name of transliteration scheme"""
-    return scheme in SCHEMES
+    """Validate the name of transliteration scheme
+
+    Parameters
+    ----------
+    scheme : str
+        Name of the transltieration scheme
+
+    Returns
+    -------
+    str or None
+        If scheme is valid, scheme.lower()
+        otherwise, None.
+    """
+    if scheme is not None:
+        scheme = scheme.lower() if scheme.lower() in SCHEMES else None
+        if scheme is None:
+            LOGGER.warning(f"Invalid transliteration scheme '{scheme}'.")
+
+    return scheme
 
 
 def transliterate_between(
