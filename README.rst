@@ -86,20 +86,27 @@ Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`)::
 
 Search in a dictionary::
 
-    # Any loaded dictionary will be accessible like an attribute
+    # Any loaded dictionary is accessible through `dicts` using dictionary ID
+    # e.g. CDSL.dicts["MW"]
+    results = CDSL.dicts["MW"].search("राम")
+
+    # Alternatively, they are also accessible like an attribute
     # e.g. CDSL.MW, CDSL.MWE etc.
     results = CDSL.MW.search("राम")
 
+    # Note: Attribute access actually uses the `dicts` property under the hood
+    # to access the dictionaries.
+
 Access an entry by ID::
 
-    entry = CDSL.MW.entry('263938')
+    entry = CDSL.MW.entry("263938")
 
     # >>> entry
     # <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
 Transliterate a single entry::
 
-    # >>> entry.transliterate('slp1')
+    # >>> entry.transliterate("slp1")
     # <MWEntry: 263938: hfzIkeSa = lord of the senses (said of Manas), BhP.>
 
 Change transliteration scheme for a dictionary::
