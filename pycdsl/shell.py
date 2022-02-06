@@ -2,13 +2,13 @@
 
 import os
 import cmd
-import sys
 import logging
 
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
 from .pycdsl import CDSLCorpus, INTERNAL_SCHEME, DEFAULT_SCHEME
+from .utils import validate_scheme
 from . import __version__
 
 ###############################################################################
@@ -34,6 +34,8 @@ class BasicShell(cmd.Cmd):
 
 
 class CDSLShell(BasicShell):
+    """REPL Interface to CDSL"""
+
     intro = "Cologne Sanskrit Digital Lexicon (CDSL)\n" \
             "---------------------------------------"
     desc = "Install or load a lexicon by typing `use <DICT_ID>` " \
@@ -42,7 +44,30 @@ class CDSLShell(BasicShell):
            "(help or ? for list of options)"
     prompt = "(CDSL::None) "
 
-    def __init__(self, data_dir=None, dict_ids=None):
+    def __init__(
+        self,
+        data_dir=None,
+        dict_ids=None,
+        input_scheme=None,
+        output_scheme=None
+    ):
+        """REPL Interface to CDSL
+
+        Parameters
+        ----------
+        data_dir : str, optional
+            Load a CDSL installation instance at the location `data_dir`.
+            Passed to CDSLCorpus instance as a keyword argument `data_dir`.
+        dict_ids : list, optional
+            List of dictionary IDs to setup.
+            Passed to a CDSLCorpus instance as a keyword argument `dict_ids`.
+        input_scheme : str, optional
+            Transliteration scheme for input.
+            The default is `DEFAULT_SCHEME`.
+        output_scheme : str, optional
+            Transliteration scheme for output,
+            The default is `DEFAULT_SCHEME`.
+        """
         super(self.__class__, self).__init__()
         self.debug = False
         self.schemes = [
@@ -54,10 +79,9 @@ class CDSLShell(BasicShell):
             sanscript.SLP1,
             sanscript.WX,
         ]
-        self.input_scheme = sanscript.DEVANAGARI
 
-        self.input_scheme = DEFAULT_SCHEME
-        self.output_scheme = DEFAULT_SCHEME
+        self.input_scheme = validate_scheme(input_scheme) or DEFAULT_SCHEME
+        self.output_scheme = validate_scheme(output_scheme) or DEFAULT_SCHEME
 
         self.cdsl = CDSLCorpus(data_dir=data_dir, scheme=None)
         self.dict_ids = dict_ids
@@ -214,15 +238,3 @@ class CDSLShell(BasicShell):
 
 
 ###############################################################################
-
-
-def main():
-    """Shell Interface for PyCDSL"""
-    cdsl = CDSLShell()
-    cdsl.cmdloop()
-
-###############################################################################
-
-
-if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
