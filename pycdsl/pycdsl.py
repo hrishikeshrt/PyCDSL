@@ -322,7 +322,7 @@ class CDSLDict:
         Parameters
         ----------
         pattern : str
-            Search pattern, may contain wildcards.
+            Search pattern, may contain wildcards (`*`).
         input_scheme : str or None, optional
             Input transliteration scheme
             If None, `self.input_scheme` will be used.

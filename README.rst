@@ -31,9 +31,6 @@ PyCDSL is a python interface to `Cologne Digital Sanskrit Lexicon (CDSL)`_.
 
 .. _`Cologne Digital Sanskrit Lexicon (CDSL)`: https://www.sanskrit-lexicon.uni-koeln.de/
 
-It lets you download and access various dictionaries from CDSL
-programmatically as well as through a REPL.
-
 
 * Free software: GNU General Public License v3
 * Documentation: https://pycdsl.readthedocs.io.
