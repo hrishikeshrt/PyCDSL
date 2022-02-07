@@ -58,7 +58,6 @@ def main():
         help="Update the specified dictionaries."
     )
     args = vars(parser.parse_args())
-    print(args)
 
     if args.get("interactive"):
         cdsl_shell = CDSLShell(
