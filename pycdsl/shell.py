@@ -83,7 +83,11 @@ class CDSLShell(BasicShell):
         self.input_scheme = validate_scheme(input_scheme) or DEFAULT_SCHEME
         self.output_scheme = validate_scheme(output_scheme) or DEFAULT_SCHEME
 
-        self.cdsl = CDSLCorpus(data_dir=data_dir, scheme=None)
+        self.cdsl = CDSLCorpus(
+            data_dir=data_dir,
+            input_scheme=None,
+            output_scheme=None
+        )
         self.dict_ids = dict_ids
         self.active = None
 
@@ -228,6 +232,8 @@ class CDSLShell(BasicShell):
         self.cdsl.setup(dict_ids=self.dict_ids)
 
         print(f"Loaded {len(self.cdsl.dicts)} dictionaries.")
+        if len(self.cdsl.dicts) == 1:
+            self.do_use(next(iter(self.cdsl.dicts)))
 
         while True:
             try:

@@ -20,7 +20,7 @@ def main():
     parser.add_argument(
         "-i",
         "--interactive",
-        action='store_true',
+        action="store_true",
         help="Start in an interactive REPL mode"
     )
     parser.add_argument(
@@ -36,41 +36,54 @@ def main():
     parser.add_argument(
         "-d",
         "--dicts",
-        nargs='+',
+        nargs="+",
         help="Dictionary IDs"
     )
     parser.add_argument(
         "-is",
         "--input-scheme",
+        default=DEFAULT_SCHEME,
         help="Input transliteration scheme"
     )
     parser.add_argument(
         "-os",
         "--output-scheme",
+        default=DEFAULT_SCHEME,
         help="Output transliteration scheme"
     )
+    parser.add_argument(
+        "-u",
+        "--update",
+        action="store_true",
+        help="Update the specified dictionaries."
+    )
     args = vars(parser.parse_args())
+    print(args)
 
-    if args['interactive']:
+    if args.get("interactive"):
         cdsl_shell = CDSLShell(
-            data_dir=args.get('path'),
-            dict_ids=args.get('dicts'),
-            input_scheme=args.get('input-scheme'),
-            output_scheme=args.get('output-scheme')
+            data_dir=args.get("path"),
+            dict_ids=args.get("dicts"),
+            input_scheme=args.get("input_scheme"),
+            output_scheme=args.get("output_scheme")
         )
+        if args.get("update"):
+            cdsl_shell.cdsl.setup(dict_ids=args.get("dicts"), update=True)
         cdsl_shell.cmdloop()
     else:
-        if not args.get('search'):
+        if not args.get("search"):
+            print("Must specify a search pattern in non-interactive mode.")
             parser.print_help()
             return 1
 
         cdsl = CDSLCorpus(
-            data_dir=args.get('path'),
-            scheme=None
+            data_dir=args.get("path"),
+            input_scheme=args.get("input_scheme"),
+            output_scheme=args.get("output_scheme")
         )
-        cdsl.setup(args.get('dicts'))
-        active_dict = list(cdsl.dicts)[0]
-        for result in cdsl.dicts[active_dict].search(args.get('search')):
+        cdsl.setup(args.get("dicts"), update=args.get("update"))
+        active_dict = next(iter(cdsl.dicts))
+        for result in cdsl.dicts[active_dict].search(args.get("search")):
             print(result)
 
     return 0
