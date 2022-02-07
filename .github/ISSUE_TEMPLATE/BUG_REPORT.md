@@ -1,4 +1,12 @@
-* Python Interface to Cologne Digital Sanskrit Lexicon (CDSL) version:
+---
+name: Bug Report
+about: Use this template for reporting a bug
+title: "BUG: [INFORMATIVE TITLE]"
+labels: bug
+assignees: ''
+---
+
+* PyCDSL version:
 * Python version:
 * Operating System:
 
