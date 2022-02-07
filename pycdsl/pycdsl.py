@@ -84,8 +84,18 @@ class CDSLDict:
     name: str
     url: str = field(repr=False)
     db: str = field(repr=False, default=None)
-    scheme: str = field(repr=False, default=DEFAULT_SCHEME)
-    transliterate_keys: bool = field(repr=False, default=True)
+    input_scheme: str = field(repr=False, default=None)
+    output_scheme: str = field(repr=False, default=None)
+    transliterate_keys: bool = field(repr=False, default=None)
+
+    # ----------------------------------------------------------------------- #
+
+    def __post_init__(self):
+        self.set_scheme(
+            input_scheme=self.input_scheme,
+            output_scheme=self.output_scheme,
+            transliterate_keys=self.transliterate_keys
+        )
 
     # ----------------------------------------------------------------------- #
 
@@ -214,22 +224,46 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    def set_scheme(self, scheme, transliterate_keys=True):
+    def set_scheme(
+        self,
+        input_scheme=None,
+        output_scheme=None,
+        transliterate_keys=None
+    ):
         """Set transliteration scheme for the dictionary instance
 
         Parameters
         ----------
-        scheme : str, optional
+        input_scheme : str, optional
+            Input transliteration scheme.
+            If None, `INTERNAL_SCHEME` is used.
+            The default is None.
+        output_scheme : str, optional
             Output transliteration scheme.
+            If None, `INTERNAL_SCHEME` is used.
+            The default is None.
         transliterate_keys : bool, optional
             Determines whether the keys in lexicon should be transliterated
             to `scheme` or not.
-            The default is True.
+            If None, the value will be inferred based on dictionary type.
+            The default is None.
         """
-        self.scheme = validate_scheme(scheme)
+        input_scheme = validate_scheme(input_scheme) or INTERNAL_SCHEME
+        output_scheme = validate_scheme(output_scheme) or INTERNAL_SCHEME
+        if transliterate_keys is None:
+            transliterate_keys = (self.id in ENGLISH_DICTIONARIES)
+
+        if (
+            self.input_scheme != input_scheme or
+            self.output_scheme != output_scheme or
+            self.transliterate_keys != transliterate_keys
+        ):
+            self.search.cache_clear()
+            self.stats.cache_clear()
+
+        self.input_scheme = input_scheme
+        self.output_scheme = output_scheme
         self.transliterate_keys = transliterate_keys
-        self.search.cache_clear()
-        self.stats.cache_clear()
 
     # ----------------------------------------------------------------------- #
 
@@ -276,13 +310,27 @@ class CDSLDict:
     # ----------------------------------------------------------------------- #
 
     @lru_cache(maxsize=4096)
-    def search(self, search_key, ignore_case=False):
+    def search(
+        self,
+        pattern,
+        input_scheme=None,
+        output_scheme=None,
+        ignore_case=False
+    ):
         """Search in the dictionary
 
         Parameters
         ----------
-        search_key : str
-            Search key, may contain wildcards.
+        pattern : str
+            Search pattern, may contain wildcards.
+        input_scheme : str or None, optional
+            Input transliteration scheme
+            If None, `self.input_scheme` will be used.
+            The default is None.
+        output_scheme : str or None, optional
+            Output transliteration scheme
+            If None, `self.output_scheme` will be used.
+            The default is None.
         ignore_case : bool, optional
             Ignore case while performing lookup.
             The default is False.
@@ -292,32 +340,52 @@ class CDSLDict:
         list
             List of matching entries
         """
-        if self.scheme:
-            search_key = transliterate(
-                search_key, self.scheme, INTERNAL_SCHEME
-            )
+        input_scheme = validate_scheme(input_scheme) or self.input_scheme
+        output_scheme = validate_scheme(output_scheme) or self.output_scheme
 
-        query = self._lexicon.select().where(self._lexicon.key % search_key)
-        iquery = self._lexicon.select().where(self._lexicon.key ** search_key)
+        pattern = transliterate(pattern, input_scheme, INTERNAL_SCHEME)
+
+        query = self._lexicon.select().where(self._lexicon.key % pattern)
+        iquery = self._lexicon.select().where(self._lexicon.key ** pattern)
         search_query = iquery if ignore_case else query
         return [
             self._entry(
                 result,
-                scheme=self.scheme,
+                scheme=output_scheme,
                 transliterate_keys=self.transliterate_keys
             )
             for result in search_query
         ]
 
-    def entry(self, entry_id):
-        """Get an entry by ID"""
-        return self._entry(
-            self._lexicon.get(self._lexicon.id == entry_id),
-            scheme=self.scheme,
-            transliterate_keys=self.transliterate_keys
-        )
+    def entry(self, entry_id, output_scheme=None):
+        """Get an entry by ID
 
-    def dump(self, output_path=None):
+        Parameters
+        ----------
+        entry_id : str
+            Entry ID to lookup
+        output_scheme : str or None, optional
+            Output transliteration scheme
+            If None, `self.output_scheme` will be used.
+            The default is None.
+
+        Returns
+        -------
+        object
+            Lexicon Entry
+        """
+
+        output_scheme = validate_scheme(output_scheme) or self.output_scheme
+        try:
+            return self._entry(
+                self._lexicon.get(self._lexicon.id == entry_id),
+                scheme=output_scheme,
+                transliterate_keys=self.transliterate_keys
+            )
+        except Exception:
+            LOGGER.error(f"No entry with ID '{entry_id}' was found")
+
+    def dump(self, output_path=None, output_scheme=None):
         """
         Dump data as JSON
 
@@ -327,6 +395,10 @@ class CDSLDict:
             Path to the output JSON file.
             If None, the data isn't written to the disk, only returned.
             The default is None.
+        output_scheme : str or None, optional
+            Output transliteration scheme
+            If None, `self.output_scheme` will be used.
+            The default is None
 
         Returns
         -------
@@ -334,6 +406,7 @@ class CDSLDict:
             List of all the entries in the dictionary. Every entry is a `dict`.
             If `output_path` is provided, the same list is written as JSON.
         """
+        output_scheme = validate_scheme(output_scheme) or self.output_scheme
         data = [{
             "id": str(entry.id),
             "key": entry.key,
@@ -342,7 +415,7 @@ class CDSLDict:
         } for entry in (
             self._entry(
                 result,
-                scheme=self.scheme,
+                scheme=output_scheme,
                 transliterate_keys=self.transliterate_keys
             ) for result in self._lexicon.select()
         )]
@@ -363,7 +436,8 @@ class CDSLCorpus:
     Refers to a CDSL installation instance at the location `data_dir`.
     """
     data_dir: str = field(default=None)
-    scheme: str = field(repr=False, default=DEFAULT_SCHEME)
+    input_scheme: str = field(repr=False, default=DEFAULT_SCHEME)
+    output_scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
 
     # ----------------------------------------------------------------------- #
@@ -421,7 +495,7 @@ class CDSLCorpus:
             dict_ids = DEFAULT_DICTIONARIES + list(self.get_installed_dicts())
 
         if isinstance(dict_ids, list):
-            dict_ids = set(dict_ids)
+            dict_ids = {dict_id.upper() for dict_id in dict_ids}
             setup_dicts = {
                 dict_id: cdsl_dict
                 for dict_id, cdsl_dict in self.available_dicts.items()
@@ -477,7 +551,8 @@ class CDSLCorpus:
                 date=dict_date,
                 name=dict_name,
                 url=dict_download,
-                scheme=self.scheme,
+                input_scheme=self.input_scheme,
+                output_scheme=self.output_scheme,
                 transliterate_keys=dict_transliterate_keys
             )
 
