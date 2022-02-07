@@ -1,4 +1,8 @@
-"""Console script for PyCDSL"""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""REPL Shell for PyCDSL"""
+
+###############################################################################
 
 import os
 import cmd

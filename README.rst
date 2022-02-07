@@ -114,12 +114,38 @@ Change transliteration scheme for a dictionary::
     CDSL.MW.set_scheme("itrans")
     CDSL.MW.search("rAma")
 
+Using Console Interface of PyCDSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Help to the Console Interface::
+
+    usage: CLI for PyCDSL [-h] [-i] [-s SEARCH] [-p PATH] [-d DICTS [DICTS ...]] [-is INPUT_SCHEME] [-os OUTPUT_SCHEME] [-u] [-dbg]
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    -i, --interactive     Start in an interactive REPL mode
+    -s SEARCH, --search SEARCH
+                            Search pattern. Ignored if `--interactive` mode is set.
+    -p PATH, --path PATH  Path to installation
+    -d DICTS [DICTS ...], --dicts DICTS [DICTS ...]
+                            Dictionary IDs
+    -is INPUT_SCHEME, --input-scheme INPUT_SCHEME
+                            Input transliteration scheme
+    -os OUTPUT_SCHEME, --output-scheme OUTPUT_SCHEME
+                            Output transliteration scheme
+    -u, --update          Update the specified dictionaries.
+    -dbg, --debug         Turn debug mode on.
+
+
+*Note*: Arguments for specifying installation path, dictionary IDs, input and output transliteration schemes
+are valid for both interactive REPL shell and non-interactive console command.
+
 Using REPL Interface of PyCDSL
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To use REPL Interface to Cologne Digital Sanskrit Lexicon (CDSL)::
 
-    $ cdsl
+    $ cdsl -i
 
 Example of a REPL Session::
 

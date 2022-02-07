@@ -1,6 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """Console script for PyCDSL"""
 
+###############################################################################
+
 import sys
+import logging
 import argparse
 
 from indic_transliteration import sanscript
@@ -10,6 +15,13 @@ from .pycdsl import CDSLCorpus, INTERNAL_SCHEME, DEFAULT_SCHEME
 from .shell import CDSLShell
 from .utils import validate_scheme
 from . import __version__
+
+###############################################################################
+
+ROOT_LOGGER = logging.getLogger()
+if not ROOT_LOGGER.hasHandlers():
+    ROOT_LOGGER.addHandler(logging.StreamHandler())
+ROOT_LOGGER.setLevel(logging.INFO)
 
 ###############################################################################
 
@@ -57,7 +69,16 @@ def main():
         action="store_true",
         help="Update the specified dictionaries."
     )
+    parser.add_argument(
+        "-dbg",
+        "--debug",
+        action="store_true",
+        help="Turn debug mode on."
+    )
     args = vars(parser.parse_args())
+
+    if args.get('debug'):
+        ROOT_LOGGER.setLevel(logging.DEBUG)
 
     if args.get("interactive"):
         cdsl_shell = CDSLShell(
@@ -71,7 +92,9 @@ def main():
         cdsl_shell.cmdloop()
     else:
         if not args.get("search"):
-            print("Must specify a search pattern in non-interactive mode.")
+            ROOT_LOGGER.error(
+                "Must specify a search pattern in non-interactive mode."
+            )
             parser.print_help()
             return 1
 
