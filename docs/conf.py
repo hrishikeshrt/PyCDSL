@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Python Interface to Cologne Digital Sanskrit Lexicon (CDSL)'
+project = 'PyCDSL'
 copyright = "2022, Hrishikesh Terdalkar"
 author = "Hrishikesh Terdalkar"
 
@@ -139,7 +139,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pycdsl',
+    (master_doc, 'PyCDSL',
      'Python Interface to Cologne Digital Sanskrit Lexicon (CDSL) Documentation',
      [author], 1)
 ]
@@ -151,10 +151,10 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pycdsl',
+    (master_doc, 'PyCDSL',
      'Python Interface to Cologne Digital Sanskrit Lexicon (CDSL) Documentation',
      author,
-     'pycdsl',
+     'PyCDSL',
      'One line description of project.',
      'Miscellaneous'),
 ]

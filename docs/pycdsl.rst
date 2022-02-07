@@ -28,6 +28,14 @@ pycdsl.pycdsl module
    :undoc-members:
    :show-inheritance:
 
+pycdsl.shell module
+-------------------
+
+.. automodule:: pycdsl.shell
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pycdsl.utils module
 -------------------
 

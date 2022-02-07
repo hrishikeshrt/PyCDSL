@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install Python Interface to Cologne Digital Sanskrit Lexicon (CDSL), run this command in your terminal:
+To install PyCDSL, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install pycdsl
+    $ pip install PyCDSL
 
-This is the preferred method to install Python Interface to Cologne Digital Sanskrit Lexicon (CDSL), as it will always install the most recent stable release.
+This is the preferred method to install PyCDSL, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for Python Interface to Cologne Digital Sanskrit Lexicon (CDSL) can be downloaded from the `Github repo`_.
+The sources for PyCDSL can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/hrishikeshrt/pycdsl
+    $ git clone git://github.com/hrishikeshrt/PyCDSL
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/hrishikeshrt/pycdsl/tarball/master
+    $ curl -OJL https://github.com/hrishikeshrt/PyCDSL/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/hrishikeshrt/pycdsl
-.. _tarball: https://github.com/hrishikeshrt/pycdsl/tarball/master
+.. _Github repo: https://github.com/hrishikeshrt/PyCDSL
+.. _tarball: https://github.com/hrishikeshrt/PyCDSL/tarball/master
