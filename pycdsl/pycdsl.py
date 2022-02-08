@@ -287,8 +287,20 @@ class CDSLDict:
     # ----------------------------------------------------------------------- #
 
     @lru_cache(maxsize=1)
-    def stats(self):
-        """Display statistics about the lexicon"""
+    def stats(self, top=10):
+        """Display statistics about the lexicon
+
+        Parameters
+        ----------
+        top : int, optional
+            Display top `top` entries having most different meanings.
+            The default is 10.
+
+        Returns
+        -------
+        dict
+            Statistics about the dictionary
+        """
         lex = self._lexicon
         total_count = lex.select().count()
         distinct_query = (
@@ -299,12 +311,24 @@ class CDSLDict:
             .group_by(lex.key)
             .order_by(fn.COUNT(lex.key).desc())
         )
-        top = [(item.key, item.count) for item in distinct_query.limit(10)]
+        top_entries = [
+            (
+                (
+                    transliterate(
+                        item.key,
+                        INTERNAL_SCHEME,
+                        self.output_scheme
+                    ) if self.transliterate_keys else item.key
+                ),
+                item.count
+            )
+            for item in distinct_query.limit(top)
+        ]
         distinct_count = distinct_query.count()
         return {
             "total": total_count,
             "distinct": distinct_count,
-            "top": top
+            "top": top_entries
         }
 
     # ----------------------------------------------------------------------- #
