@@ -17,3 +17,4 @@ __version__ = '0.3.1'
 
 from .models import DEFAULT_SCHEME, INTERNAL_SCHEME    # noqa
 from .pycdsl import CDSLDict, CDSLCorpus               # noqa
+from .shell import CDSLShell                           # noqa
