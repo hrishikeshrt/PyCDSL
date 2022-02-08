@@ -500,9 +500,9 @@ class CDSLCorpus:
 
         Parameters
         ----------
-        dict_ids : list, optional
+        dict_ids : list or None, optional
             List of dictionary IDs to setup.
-            If `None`, the dictionaries from `DEFAULT_DICTIONARIES` as well as
+            If None, the dictionaries from `DEFAULT_DICTIONARIES` as well as
             locally installed dictionaries will be setup.
             The default is None.
         update : bool, optional

@@ -59,18 +59,20 @@ class CDSLShell(BasicShell):
 
         Parameters
         ----------
-        data_dir : str, optional
+        data_dir : str or None, optional
             Load a CDSL installation instance at the location `data_dir`.
             Passed to CDSLCorpus instance as a keyword argument `data_dir`.
-        dict_ids : list, optional
+        dict_ids : list or None, optional
             List of dictionary IDs to setup.
             Passed to a CDSLCorpus instance as a keyword argument `dict_ids`.
-        input_scheme : str, optional
+        input_scheme : str or None, optional
             Transliteration scheme for input.
-            The default is `DEFAULT_SCHEME`.
-        output_scheme : str, optional
-            Transliteration scheme for output,
-            The default is `DEFAULT_SCHEME`.
+            If None, `DEFAULT_SCHEME` is used.
+            The default is None.
+        output_scheme : str or None, optional
+            Transliteration scheme for output.
+            If None, `DEFAULT_SCHEME` is used.
+            The default is None.
         """
         super(self.__class__, self).__init__()
         self.debug = False
