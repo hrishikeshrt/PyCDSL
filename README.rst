@@ -68,14 +68,14 @@ Create a CDSLCorpus Instance:
     CDSL = pycdsl.CDSLCorpus()
 
     # Custom installation path can be specified with argument `data_dir`
-    # e.g. CDSL = pycdsl.CDSLCorpus(data_dir='custom-installation-path')
+    # e.g. CDSL = pycdsl.CDSLCorpus(data_dir="custom-installation-path")
 
     # Custom transliteration schemes for input and output can be specified
     # with arguments `input_scheme` and `output_scheme`.
     # Values should be valid names of the schemes from `indic-transliteration`
     # If unspecified, `DEFAULT_SCHEME` (`devanagari`) would be used.
 
-    CDSL = pycdsl.CDSLCorpus(input_scheme='itrans', output_scheme='iast')
+    CDSL = pycdsl.CDSLCorpus(input_scheme="itrans", output_scheme="iast")
 
 Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`):
 
@@ -110,18 +110,18 @@ Search in a dictionary:
     # True
 
     # `input_scheme` and `output_scheme` can be specified to the search function.
-    CDSL.MW.search('kṛṣṇa', input_scheme='iast', output_scheme='itrans')[0]
+    CDSL.MW.search("kṛṣṇa", input_scheme="iast", output_scheme="itrans")[0]
     # <MWEntry: 55142: kRRiShNa = 1. kRRiShNa/ mf(A/)n. black, dark, dark-blue (opposed to shveta/, shukla/, ro/hita, and aruNa/), RV.; AV. &c.>
 
     # Search using wildcard (i.e. `*`)
     # e.g. To search all etnries starting with kRRi (i.e. कृ)
-    CDSL.MW.search('kRRi*', input_scheme='itrans')
+    CDSL.MW.search("kRRi*", input_scheme="itrans")
 
     # Limit and/or Offset the number of search results, e.g.
     # Show the first 10 results
-    CDSL.MW.search('kṛ*', input_scheme='iast', limit=10)
+    CDSL.MW.search("kṛ*", input_scheme="iast", limit=10)
     # Show the next 10 results
-    CDSL.MW.search('kṛ*', input_scheme='iast', limit=10, offset=10)
+    CDSL.MW.search("kṛ*", input_scheme="iast", limit=10, offset=10)
 
 Access an entry by ID:
 
@@ -134,7 +134,7 @@ Access an entry by ID:
 
     # Output transliteration scheme can also be provided
 
-    CDSL.MW.entry("263938", output_scheme='iast')
+    CDSL.MW.entry("263938", output_scheme="iast")
     # <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
 
 :code:`Entry` class also supports transliteration after creation.
