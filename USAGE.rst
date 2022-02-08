@@ -7,13 +7,15 @@ as an interactive REPL interface.
 Using PyCDSL in a Project
 -------------------------
 
-.. highlight:: python
+Import PyCDSL in a project:
 
-Import PyCDSL in a project::
+.. code-block:: python
 
     import pycdsl
 
-Create a CDSLCorpus Instance::
+Create a CDSLCorpus Instance:
+
+.. code-block:: python
 
     # Default installation at ~/cdsl_data
     CDSL = pycdsl.CDSLCorpus()
@@ -28,7 +30,9 @@ Create a CDSLCorpus Instance::
 
     CDSL = pycdsl.CDSLCorpus(input_scheme='itrans', output_scheme='iast')
 
-Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`)::
+Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`):
+
+.. code-block:: python
 
     # Note: Any additional dictionaries that are installed will also be loaded.
     CDSL.setup()
@@ -41,7 +45,9 @@ Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`)::
     # in `dict_ids` and if available, the updated version is installed
     # e.g. CDSL.setup(["MW"], update=True)
 
-Search in a dictionary::
+Search in a dictionary:
+
+.. code-block:: python
 
     # Any loaded dictionary is accessible through `dicts` using dictionary ID
     # e.g. CDSL.dicts["MW"]
@@ -60,7 +66,9 @@ Search in a dictionary::
     CDSL.MW.search('kṛṣṇa', input_scheme='iast', output_scheme='itrans')[0]
     # <MWEntry: 55142: kRRiShNa = 1. kRRiShNa/ mf(A/)n. black, dark, dark-blue (opposed to shveta/, shukla/, ro/hita, and aruNa/), RV.; AV. &c.>
 
-Access an entry by ID::
+Access an entry by ID:
+
+.. code-block:: python
 
     entry = CDSL.MW.entry("263938")
 
@@ -75,12 +83,16 @@ Access an entry by ID::
 :code:`Entry` class also supports transliteration after creation.
 Thus, any entry fetched either through :code:`search()` function or through :code:`entry()` function can be transliterated.
 
-Transliterate a single entry::
+Transliterate a single entry:
+
+.. code-block:: python
 
     CDSL.MW.entry("263938").transliterate("slp1")
     # <MWEntry: 263938: hfzIkeSa = lord of the senses (said of Manas), BhP.>
 
-Change transliteration scheme for a dictionary::
+Change transliteration scheme for a dictionary:
+
+.. code-block:: python
 
     CDSL.MW.set_scheme(input_scheme="itrans")
     CDSL.MW.search("rAma")
