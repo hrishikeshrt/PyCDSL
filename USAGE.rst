@@ -66,6 +66,16 @@ Search in a dictionary:
     CDSL.MW.search('kṛṣṇa', input_scheme='iast', output_scheme='itrans')[0]
     # <MWEntry: 55142: kRRiShNa = 1. kRRiShNa/ mf(A/)n. black, dark, dark-blue (opposed to shveta/, shukla/, ro/hita, and aruNa/), RV.; AV. &c.>
 
+    # Search using wildcard (i.e. `*`)
+    # e.g. To search all etnries starting with kRRi (i.e. कृ)
+    CDSL.MW.search('kRRi*', input_scheme='itrans')
+
+    # Limit and/or Offset the number of search results, e.g.
+    # Show the first 10 results
+    CDSL.MW.search('kṛ*', input_scheme='iast', limit=10)
+    # Show the next 10 results
+    CDSL.MW.search('kṛ*', input_scheme='iast', limit=10, offset=10)
+
 Access an entry by ID:
 
 .. code-block:: python
