@@ -129,7 +129,17 @@ class Entry:
 
     @lru_cache(maxsize=1)
     def meaning(self):
+        """Extract meaning of the entry"""
         return self._body.get_text().strip()
+
+    def to_dict(self):
+        """Get a python `dict` representation of the entry"""
+        return {
+            "id": str(self.id),
+            "key": self.key,
+            "data": self.data,
+            "text": self.meaning()
+        }
 
     def parse(self):
         raise NotImplementedError

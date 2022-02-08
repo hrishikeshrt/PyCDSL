@@ -439,18 +439,17 @@ class CDSLDict:
             If `output_path` is provided, the same list is written as JSON.
         """
         output_scheme = validate_scheme(output_scheme) or self.output_scheme
-        data = [{
-            "id": str(entry.id),
-            "key": entry.key,
-            "data": entry.data,
-            "text": entry.meaning()
-        } for entry in (
-            self._entry(
-                result,
-                scheme=output_scheme,
-                transliterate_keys=self.transliterate_keys
-            ) for result in self._lexicon.select()
-        )]
+        data = [
+            entry.to_dict()
+            for entry in (
+                self._entry(
+                    result,
+                    scheme=output_scheme,
+                    transliterate_keys=self.transliterate_keys
+                )
+                for result in self._lexicon.select()
+            )
+        ]
         if output_path is not None:
             with open(output_path, mode="w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False)
