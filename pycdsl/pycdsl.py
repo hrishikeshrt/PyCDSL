@@ -339,7 +339,8 @@ class CDSLDict:
         pattern,
         input_scheme=None,
         output_scheme=None,
-        ignore_case=False
+        ignore_case=False,
+        limit=None
     ):
         """Search in the dictionary
 
@@ -358,6 +359,9 @@ class CDSLDict:
         ignore_case : bool, optional
             Ignore case while performing lookup.
             The default is False.
+        limit : int or None, optional
+            Limit the number of search results to `limit`.
+            The default is None.
 
         Returns
         -------
@@ -378,7 +382,7 @@ class CDSLDict:
                 scheme=output_scheme,
                 transliterate_keys=self.transliterate_keys
             )
-            for result in search_query
+            for result in search_query.limit(limit)
         ]
 
     def entry(self, entry_id, output_scheme=None):
