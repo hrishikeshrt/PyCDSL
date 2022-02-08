@@ -95,6 +95,10 @@ class CDSLShell(BasicShell):
         self.dict_ids = dict_ids
         self.active = None
 
+        # Search parameters
+        self.limit = 50
+        self.offset = None
+
         # Logging
         self.logger = logging.getLogger()  # root logger
         if not self.logger.hasHandlers():
@@ -221,7 +225,7 @@ class CDSLShell(BasicShell):
             search_key = transliterate(
                 line, self.input_scheme, INTERNAL_SCHEME
             ) if self.active.transliterate_keys else line
-            results = self.active.search(search_key)[:50]
+            results = self.active.search(search_key, limit=self.limit)
             for result in results:
                 print(
                     result.transliterate(
