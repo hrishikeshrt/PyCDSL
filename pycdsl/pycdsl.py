@@ -552,6 +552,86 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
+    def search(
+        self,
+        pattern,
+        dict_ids=None,
+        input_scheme=None,
+        output_scheme=None,
+        ignore_case=False,
+        limit=None,
+        offset=None,
+        omit_empty=True
+    ):
+        """Search in the dictionary
+
+        Parameters
+        ----------
+        pattern : str
+            Search pattern, may contain wildcards (`*`).
+        dict_ids : list or None
+            List of dictionary IDs to search in.
+            Only the `dict_ids` that exist in `self.dicts` will be used.
+            If None, all the dictionaries that have been setup,
+            i.e., the dictionaries from `self.dicts` will be used.
+            The default is None.
+        input_scheme : str or None, optional
+            Input transliteration scheme
+            If None, `self.input_scheme` will be used.
+            The default is None.
+        output_scheme : str or None, optional
+            Output transliteration scheme
+            If None, `self.output_scheme` will be used.
+            The default is None.
+        ignore_case : bool, optional
+            Ignore case while performing lookup.
+            The default is False.
+        limit : int or None, optional
+            Limit the number of search results to `limit`.
+            The default is None.
+        offset : int or None, optional
+            Offset the search results by `offset`.
+            The default is None
+        omit_empty : bool, optional
+            If True, only the non-empty search results will be included.
+            The default is False.
+
+        Returns
+        -------
+        dict
+            Dictionary of (dict_id, list of matching entries)
+        """
+        all_results = {}
+
+        if dict_ids is None:
+            dict_ids = list(self.dicts)
+
+        if isinstance(dict_ids, list):
+            dict_ids = {
+                dict_id.upper()
+                for dict_id in dict_ids
+                if dict_id.upper() in self.dicts
+            }
+        else:
+            raise ValueError("`dict_ids` must be a `list` or `None`")
+
+        for dict_id in dict_ids:
+            dict_results = self.dicts[dict_id].search(
+                pattern=pattern,
+                input_scheme=input_scheme,
+                output_scheme=output_scheme,
+                ignore_case=ignore_case,
+                limit=limit,
+                offset=offset
+            )
+
+            if not omit_empty or dict_results:
+                all_results[dict_id] = dict_results
+
+        return all_results
+
+    # ----------------------------------------------------------------------- #
+
     def get_available_dicts(self):
         """
         Fetch a list of dictionaries available for download from CDSL
