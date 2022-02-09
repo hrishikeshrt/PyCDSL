@@ -15,7 +15,7 @@ PyCDSL
         :alt: Python Version Support
 
 .. image:: https://img.shields.io/github/issues/hrishikeshrt/PyCDSL
-        :target: https://github.com/hrishikeshrt
+        :target: https://github.com/hrishikeshrt/PyCDSL/issues
         :alt: GitHub Issues
 
 .. image:: https://img.shields.io/github/followers/hrishikeshrt?style=social
