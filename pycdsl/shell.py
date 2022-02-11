@@ -11,8 +11,9 @@ import logging
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
-from .pycdsl import CDSLCorpus, INTERNAL_SCHEME, DEFAULT_SCHEME
+from .corpus import CDSLCorpus
 from .utils import validate_scheme
+from .constants import INTERNAL_SCHEME, DEFAULT_SCHEME
 from . import __version__
 
 ###############################################################################
@@ -261,7 +262,7 @@ class CDSLShell(BasicShell):
 
     def do_version(self, text):
         """Show the current version of PyCDSL"""
-        print(__version__)
+        print(f"PyCDSL v{__version__}")
 
     # ----------------------------------------------------------------------- #
 

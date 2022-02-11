@@ -19,15 +19,11 @@ import bs4
 from indic_transliteration import sanscript
 
 from .utils import validate_scheme, transliterate_between
+from .constants import INTERNAL_SCHEME, DEFAULT_SCHEME
 
 ###############################################################################
 
 LOGGER = logging.getLogger(__name__)
-
-###############################################################################
-
-INTERNAL_SCHEME = sanscript.SLP1
-DEFAULT_SCHEME = sanscript.DEVANAGARI
 
 ###############################################################################
 

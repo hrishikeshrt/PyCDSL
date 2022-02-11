@@ -8,12 +8,9 @@ import sys
 import logging
 import argparse
 
-from indic_transliteration import sanscript
-from indic_transliteration.sanscript import transliterate
-
-from .pycdsl import CDSLCorpus, INTERNAL_SCHEME, DEFAULT_SCHEME
+from .corpus import CDSLCorpus
 from .shell import CDSLShell
-from .utils import validate_scheme
+from .constants import DEFAULT_SCHEME
 from . import __version__
 
 ###############################################################################
@@ -75,6 +72,14 @@ def main():
         action="store_true",
         help="Turn debug mode on."
     )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version='%(prog)s ' + __version__,
+        help="Show version and exit."
+    )
+
     args = vars(parser.parse_args())
 
     if args.get('debug'):

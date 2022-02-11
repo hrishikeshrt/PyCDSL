@@ -15,6 +15,12 @@ __version__ = '0.3.3'
 
 ###############################################################################
 
-from .models import DEFAULT_SCHEME, INTERNAL_SCHEME    # noqa
-from .pycdsl import CDSLDict, CDSLCorpus               # noqa
-from .shell import CDSLShell                           # noqa
+from .corpus import CDSLCorpus               # noqa
+from .lexicon import CDSLDict                # noqa
+from .shell import CDSLShell                 # noqa
+from .constants import (                     # noqa
+    SERVER_URL,
+    DEFAULT_SCHEME, INTERNAL_SCHEME,
+    DEFAULT_CORPUS_DIR,
+    DEFAULT_DICTIONARIES, ENGLISH_DICTIONARIES
+)
