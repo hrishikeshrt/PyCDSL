@@ -290,8 +290,9 @@ class CDSLShell(BasicShell):
         self.cdsl.setup(dict_ids=self.dict_ids)
 
         print(f"Loaded {len(self.cdsl.dicts)} dictionaries.")
-        if len(self.cdsl.dicts) == 1:
-            self.do_use(next(iter(self.cdsl.dicts)))
+
+        if self.dict_ids is not None:
+            self.do_use(" ".join(self.dict_ids))
 
         while True:
             try:
