@@ -111,10 +111,21 @@ def main():
             input_scheme=args.get("input_scheme"),
             output_scheme=args.get("output_scheme")
         )
+
         cdsl.setup(args.get("dicts"), update=args.get("update"))
-        active_dict = next(iter(cdsl.dicts))
-        for result in cdsl.dicts[active_dict].search(args.get("search")):
-            print(result)
+        all_results = cdsl.search(
+            pattern=args.get("search"),
+            dict_ids=args.get("dicts"),
+        )
+        for dict_id, dict_results in all_results.items():
+            result_count = len(dict_results)
+            print(
+                "\n"
+                f"Found {result_count} results in the dictionary '{dict_id}'."
+                "\n"
+            )
+            for result in dict_results:
+                print(result)
 
     return 0
 
