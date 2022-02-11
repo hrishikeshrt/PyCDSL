@@ -25,7 +25,10 @@ ROOT_LOGGER.setLevel(logging.INFO)
 
 def main():
     """Command Line Interface for PyCDSL"""
-    parser = argparse.ArgumentParser("CLI for PyCDSL")
+    description = (
+        "Access dictionaries from Cologne Digital Sanskrit Lexicon (CDSL)"
+    )
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         "-i",
         "--interactive",
@@ -76,7 +79,7 @@ def main():
         "-v",
         "--version",
         action="version",
-        version='%(prog)s ' + __version__,
+        version=f"%(prog)s {__version__}",
         help="Show version and exit."
     )
 
