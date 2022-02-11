@@ -20,8 +20,7 @@ from playhouse.db_url import connect
 
 import bs4
 import requests
-from requests_downloader import downloader
-
+from requests_downloader.downloader import download
 from indic_transliteration.sanscript import transliterate
 
 from .utils import validate_scheme
@@ -151,7 +150,7 @@ class CDSLDict:
             web_url = requests.compat.urljoin(self.url, web_url)
 
             # download
-            success = downloader.download(web_url, download_path=download_path)
+            success = download(web_url, download_path=download_path)
 
             if not success:
                 # download failed - restore backup
@@ -563,7 +562,7 @@ class CDSLCorpus:
         offset=None,
         omit_empty=True
     ):
-        """Search in the dictionary
+        """Search in multiple dictionaries from the corpus
 
         Parameters
         ----------
