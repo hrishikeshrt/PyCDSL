@@ -42,9 +42,9 @@ class CDSLShell(BasicShell):
 
     intro = "Cologne Sanskrit Digital Lexicon (CDSL)\n" \
             "---------------------------------------"
-    desc = "Install or load a lexicon by typing `use <DICT_ID>` " \
+    desc = "Install or load dictionaries by typing `use [DICT_IDS..]` " \
            "e.g. `use MW`.\n" \
-           "Type any keyword to search in the selected lexicon. " \
+           "Type any keyword to search in the selected dictionaries. " \
            "(help or ? for list of options)"
     prompt = "(CDSL::None) "
 
@@ -57,6 +57,9 @@ class CDSLShell(BasicShell):
     ):
         """REPL Interface to CDSL
 
+        Create an instance of CDSLCorpus as per the providd parameters.
+        CDSLCorpus.setup() is called after the command-loop starts.
+
         Parameters
         ----------
         data_dir : str or None, optional
@@ -64,7 +67,7 @@ class CDSLShell(BasicShell):
             Passed to CDSLCorpus instance as a keyword argument `data_dir`.
         dict_ids : list or None, optional
             List of dictionary IDs to setup.
-            Passed to a CDSLCorpus instance as a keyword argument `dict_ids`.
+            Passed to a CDSLCorpus.setup() as a keyword argument `dict_ids`.
         input_scheme : str or None, optional
             Transliteration scheme for input.
             If None, `DEFAULT_SCHEME` is used.
@@ -166,12 +169,12 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
 
     def do_dicts(self, text=None):
-        """Display a list of lexicon available locally"""
+        """Display a list of dictionaries available locally"""
         for _, cdsl_dict in self.cdsl.dicts.items():
             print(cdsl_dict)
 
     def do_available(self, text=None):
-        """Display lexicons available in CDSL"""
+        """Display dictionaries available in CDSL"""
         for _, cdsl_dict in self.cdsl.available_dicts.items():
             print(cdsl_dict)
 
