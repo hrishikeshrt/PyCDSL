@@ -62,6 +62,12 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
+    def __iter__(self):
+        for cdsl_dict in self.dicts.values():
+            yield(cdsl_dict)
+
+    # ----------------------------------------------------------------------- #
+
     def setup(self, dict_ids: list = None, update: bool = False):
         """Setup CDSL dictionaries in bulk
 
