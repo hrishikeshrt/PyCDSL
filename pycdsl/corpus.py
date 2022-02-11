@@ -63,8 +63,7 @@ class CDSLCorpus:
     # ----------------------------------------------------------------------- #
 
     def __iter__(self):
-        for cdsl_dict in self.dicts.values():
-            yield(cdsl_dict)
+        yield from self.dicts.values()
 
     # ----------------------------------------------------------------------- #
 
