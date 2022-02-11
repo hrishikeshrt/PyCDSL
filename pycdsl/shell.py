@@ -250,11 +250,15 @@ class CDSLShell(BasicShell):
 
     def do_limit(self, text):
         """Limit the number of search results per dictionary"""
-        if text.strip().isdigit():
-            self.limit = int(text.strip())
-            print(f"Limit: {self.limit}")
-        else:
-            self.logger.error("Limit must be an integer.")
+        if text:
+            try:
+                self.limit = int(text.strip())
+                if self.limit < 1:
+                    self.limit = None
+            except Exception:
+                self.logger.error("Limit must be an integer.")
+
+        print(f"Limit: {self.limit}")
 
     # ----------------------------------------------------------------------- #
 
