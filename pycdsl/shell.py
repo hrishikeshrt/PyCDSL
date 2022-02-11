@@ -188,11 +188,9 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
 
     def complete_use(self, text, line, begidx, endidx):
-        words = text.upper().split()
-        pre_last_word_line = " ".join(words[:-1])
-        last_word = [-1]
+        last_word = text.upper().rsplit(maxsplit=1)[-1] if text else ""
         return [
-            f"{pre_last_word_line} {dict_id}"
+            dict_id
             for dict_id in self.cdsl.available_dicts
             if dict_id.startswith(last_word)
         ]
