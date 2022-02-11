@@ -95,7 +95,7 @@ class CDSLShell(BasicShell):
             output_scheme=None
         )
         self.dict_ids = dict_ids
-        self.active = None
+        self.active_dicts = None
 
         # Search parameters
         self.limit = 50
@@ -155,11 +155,15 @@ class CDSLShell(BasicShell):
     # Dictionary Information
 
     def do_info(self, text=None):
-        """Display information about the active dictionary"""
-        if self.active is None:
+        """Display information about active dictionaries"""
+        if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
         else:
-            print(self.active)
+            print(f"Total {len(self.active_dicts)} dictionaries are active.")
+            for active_dict in self.active_dicts:
+                print(active_dict)
+
+    # ----------------------------------------------------------------------- #
 
     def do_dicts(self, text=None):
         """Display a list of lexicon available locally"""
@@ -180,37 +184,65 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
 
     def complete_use(self, text, line, begidx, endidx):
+        words = text.upper().split()
+        pre_last_word_line = " ".join(words[:-1])
+        last_word = [-1]
         return [
-            dict_id
+            f"{pre_last_word_line} {dict_id}"
             for dict_id in self.cdsl.available_dicts
-            if dict_id.startswith(text.upper())
+            if dict_id.startswith(last_word)
         ]
 
-    def do_use(self, dict_id):
-        """Install/Load a specific lexicon from CDSL."""
-        dict_id = dict_id.upper()
-        status = (dict_id in self.cdsl.dicts) or self.cdsl.setup([dict_id])
-        if status:
-            self.active = self.cdsl.dicts[dict_id]
-            self.prompt = f"(CDSL::{self.active.id}) "
+    def do_use(self, line):
+        """
+        Load the specified dictionaries from CDSL.
+        If not available locally, they will be installed first.
+        """
+        dict_ids = line.upper().split()
+
+        self.active_dicts = []
+        for dict_id in dict_ids:
+            status = (dict_id in self.cdsl.dicts) or self.cdsl.setup([dict_id])
+            if status:
+                self.active_dicts.append(self.cdsl.dicts[dict_id])
+            else:
+                self.logger.error(f"Couldn't setup dictionary '{dict_id}'.")
+
+        active_count = len(self.active_dicts)
+        active_ids = [active_dict.id for active_dict in self.active_dicts]
+
+        print(f"Using {active_count} dictionaries: {active_ids}")
+
+        if active_count <= 3:
+            active_prompt = ",".join(active_ids)
         else:
-            self.logger.error(f"Couldn't setup dictionary '{dict_id}'.")
+            active_prompt = f"{active_ids[0]}+{active_count - 1}"
+        self.prompt = f"(CDSL::{active_prompt}) "
 
     # ----------------------------------------------------------------------- #
 
     def do_show(self, entry_id):
         """Show a specific entry by ID"""
-        if self.active is None:
+        if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
         else:
-            result = self.active.entry(entry_id)
-            print(
-                result.transliterate(
-                    scheme=self.output_scheme,
-                    transliterate_keys=self.active.transliterate_keys
-                )
-            )
-            self.logger.debug(f"Data: {result.data}")
+            for active_dict in self.active_dicts:
+                try:
+                    result = active_dict.entry(entry_id)
+                    print(
+                        result.transliterate(
+                            scheme=self.output_scheme,
+                            transliterate_keys=active_dict.transliterate_keys
+                        )
+                    )
+                    self.logger.debug(f"Data: {result.data}")
+                except Exception:
+                    result = None
+
+                if result is None:
+                    self.logger.warning(
+                        f"Entry {entry_id} not found in '{active_dict.id}'."
+                    )
 
     # ----------------------------------------------------------------------- #
 
@@ -221,20 +253,26 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
 
     def default(self, line):
-        if self.active is None:
+        if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
         else:
-            search_key = transliterate(
-                line, self.input_scheme, INTERNAL_SCHEME
-            ) if self.active.transliterate_keys else line
-            results = self.active.search(search_key, limit=self.limit)
-            for result in results:
-                print(
-                    result.transliterate(
-                        scheme=self.output_scheme,
-                        transliterate_keys=self.active.transliterate_keys
+            for active_dict in self.active_dicts:
+                search_pattern = transliterate(
+                    line, self.input_scheme, INTERNAL_SCHEME
+                ) if active_dict.transliterate_keys else line
+                results = active_dict.search(search_pattern, limit=self.limit)
+                if not results:
+                    continue
+
+                print(f"\nFound {len(results)} results in {active_dict.id}.\n")
+
+                for result in results:
+                    print(
+                        result.transliterate(
+                            scheme=self.output_scheme,
+                            transliterate_keys=active_dict.transliterate_keys
+                        )
                     )
-                )
 
     def cmdloop(self, intro=None):
         print(self.intro)
