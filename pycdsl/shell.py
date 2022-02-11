@@ -175,7 +175,7 @@ class CDSLShell(BasicShell):
             print(cdsl_dict)
 
     def do_available(self, text=None):
-        """Display dictionaries available in CDSL"""
+        """Display a list of dictionaries available in CDSL"""
         for _, cdsl_dict in self.cdsl.available_dicts.items():
             print(cdsl_dict)
 

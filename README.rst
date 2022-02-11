@@ -167,22 +167,26 @@ Help to the Console Interface:
 
 .. code-block:: console
 
-    usage: CLI for PyCDSL [-h] [-i] [-s SEARCH] [-p PATH] [-d DICTS [DICTS ...]] [-is INPUT_SCHEME] [-os OUTPUT_SCHEME] [-u] [-dbg]
+    usage: cdsl [-h] [-i] [-s SEARCH] [-p PATH] [-d DICTS [DICTS ...]]
+                [-is INPUT_SCHEME] [-os OUTPUT_SCHEME] [-u] [-dbg] [-v]
+
+    Access dictionaries from Cologne Digital Sanskrit Lexicon (CDSL)
 
     optional arguments:
-    -h, --help            show this help message and exit
-    -i, --interactive     Start in an interactive REPL mode
+    -h, --help          show this help message and exit
+    -i, --interactive   Start in an interactive REPL mode
     -s SEARCH, --search SEARCH
-                            Search pattern. Ignored if `--interactive` mode is set.
+                        Search pattern. Ignored if `--interactive` mode is set.
     -p PATH, --path PATH  Path to installation
     -d DICTS [DICTS ...], --dicts DICTS [DICTS ...]
-                            Dictionary IDs
+                        Dictionary IDs
     -is INPUT_SCHEME, --input-scheme INPUT_SCHEME
-                            Input transliteration scheme
+                        Input transliteration scheme
     -os OUTPUT_SCHEME, --output-scheme OUTPUT_SCHEME
-                            Output transliteration scheme
-    -u, --update          Update the specified dictionaries.
-    -dbg, --debug         Turn debug mode on.
+                        Output transliteration scheme
+    -u, --update        Update the specified dictionaries.
+    -dbg, --debug       Turn debug mode on.
+    -v, --version       Show version and exit.
 
 
 **Note**: Arguments for specifying installation path, dictionary IDs, input and output transliteration schemes
@@ -205,22 +209,22 @@ REPL Session Example
 
     Cologne Sanskrit Digital Lexicon (CDSL)
     ---------------------------------------
-    Install or load a lexicon by typing `use <DICT_ID>` e.g. `use MW`.
-    Type any keyword to search in the selected lexicon. (help or ? for list of options)
+    Install or load dictionaries by typing `use [DICT_IDS..]` e.g. `use MW`.
+    Type any keyword to search in the selected dictionaries. (help or ? for list of options)
     Loaded 4 dictionaries.
 
     (CDSL::None) help
 
     Documented commands (type help <topic>):
     ========================================
-    EOF        debug  exit  info          output_scheme  show    use
-    available  dicts  help  input_scheme  shell          update  version
+    EOF        debug  exit  info          limit          shell  update  version
+    available  dicts  help  input_scheme  output_scheme  show   use
 
     (CDSL::None) help available
-    Display lexicons available in CDSL
+    Display a list of dictionaries available in CDSL
 
     (CDSL::None) help dicts
-    Display a list of lexicon available locally
+    Display a list of dictionaries available locally
 
     (CDSL::None) dicts
     CDSLDict(id='AP90', date='1890', name='Apte Practical Sanskrit-English Dictionary')
@@ -235,7 +239,11 @@ REPL Session Example
     Data for dictionary 'AE' is up-to-date.
 
     (CDSL::None) use MW
+    Using 1 dictionaries: ['MW']
+
     (CDSL::MW) हृषीकेश
+
+    Found 6 results in MW.
 
     <MWEntry: 263922: हृषीकेश = हृषी-केश a   See below under हृषीक.>
     <MWEntry: 263934: हृषीकेश = हृषीकेश b m. (perhaps = हृषी-केश cf. हृषी-वत् above) id. (-त्व n.), MBh.; Hariv. &c.>
@@ -249,10 +257,11 @@ REPL Session Example
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
     (CDSL::MW) input_scheme itrans
-
     Input scheme: itrans
 
     (CDSL::MW) hRRiSIkesha
+
+    Found 6 results in MW.
 
     <MWEntry: 263922: हृषीकेश = हृषी-केश a   See below under हृषीक.>
     <MWEntry: 263934: हृषीकेश = हृषीकेश b m. (perhaps = हृषी-केश cf. हृषी-वत् above) id. (-त्व n.), MBh.; Hariv. &c.>
@@ -262,7 +271,6 @@ REPL Session Example
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
     (CDSL::MW) output_scheme iast
-
     Output scheme: iast
 
     (CDSL::MW) hRRiSIkesha
@@ -274,11 +282,51 @@ REPL Session Example
     <MWEntry: 263937: hṛṣīkeśa = of a poet, ib.>
     <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
 
-    (CDSL::MW) info
+    (CDSL::MW) limit 2
+    Limit: 2
 
+    (CDSL::MW) hRRiSIkesha
+
+    Found 2 results in MW.
+
+    <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
+    <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
+
+    (CDSL::MW) info
+    Total 1 dictionaries are active.
     CDSLDict(id='MW', date='1899', name='Monier-Williams Sanskrit-English Dictionary')
 
-    (CDSL::MW) exit
+    (CDSL::MW) use WIL
+
+    Downloading 'WIL.web.zip' ... (8394727 bytes)
+    100%|██████████████████████████████████████████████████████████████████████████████████████| 8.39M/8.39M [00:21<00:00, 386kB/s]
+    Successfully downloaded 'WIL.web.zip' from 'https://www.sanskrit-lexicon.uni-koeln.de/scans/WILScan/2020/downloads/wilweb1.zip'.
+    Using 1 dictionaries: ['WIL']
+
+    (CDSL::WIL)
+
+    (CDSL::WIL) use WIL MW
+    Using 2 dictionaries: ['WIL', 'MW']
+
+    (CDSL::WIL,MW) hRRiSIkesha
+
+    Found 1 results in WIL.
+
+    <WILEntry: 44411: hṛṣīkeśa = hṛṣīkeśa  m. (-śaḥ) KṚṢṆA or VIṢṆU. E. hṛṣīka an organ of sense, and īśa lord.>
+
+    Found 6 results in MW.
+
+    <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
+    <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
+    <MWEntry: 263935: hṛṣīkeśa = N. of the tenth month, VarBṛS.>
+    <MWEntry: 263936: hṛṣīkeśa = of a Tīrtha, Cat.>
+    <MWEntry: 263937: hṛṣīkeśa = of a poet, ib.>
+    <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
+
+    (CDSL::WIL,MW) use MW WIL AP90 MWE AE
+    Using 5 dictionaries: ['MW', 'WIL', 'AP90', 'MWE', 'AE']
+
+    (CDSL::MW+4) exit
 
     Bye
 
