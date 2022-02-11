@@ -1,10 +1,8 @@
-#!/usr/bin/env python
-
-"""Tests for `pycdsl` package."""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""Tests for `pycdsl.corpus`"""
 
 import pytest
-
-from pycdsl import pycdsl
 
 
 @pytest.fixture
