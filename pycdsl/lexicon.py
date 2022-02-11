@@ -67,6 +67,16 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
+    def __iter__(self):
+        for entry in self._lexicon.select():
+            yield self._entry(
+                entry,
+                scheme=self.output_scheme,
+                transliterate_keys=self.transliterate_keys
+            )
+
+    # ----------------------------------------------------------------------- #
+
     def download(self, download_dir):
         """Download and extract dictionary data
 
