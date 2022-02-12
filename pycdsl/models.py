@@ -30,7 +30,7 @@ LOGGER = logging.getLogger(__name__)
 
 class Lexicon(Model):
     """Lexicon Model"""
-    id = DecimalField(unique=True, decimal_places=2, db_column='lnum')
+    id = DecimalField(unique=True, decimal_places=2, column_name='lnum')
     key = CharField(index=True)
     data = TextField()
 
