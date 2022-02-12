@@ -36,7 +36,7 @@ LOGGER = logging.getLogger(__name__)
 
 ###############################################################################
 
-DICTIONARIES = {
+DEFAULT_MODEL_MAP = {
     "MW": (MWLexicon, MWEntry),
     "AP90": (AP90Lexicon, AP90Entry),
 }
@@ -245,14 +245,16 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    def connect(self, lexicon_model=None, entry_model=None):
+    def connect(self, lexicon_model=None, entry_model=None, model_map=None):
         """Connect to the SQLite database"""
         if lexicon_model is not None and entry_model is not None:
             self._lexicon = lexicon_model
             self._entry = entry_model
         else:
-            if self.id in DICTIONARIES:
-                self._lexicon, self._entry = DICTIONARIES[self.id]
+            if model_map is None:
+                model_map = DEFAULT_MODEL_MAP
+            if self.id in model_map:
+                self._lexicon, self._entry = model_map[self.id]
             else:
                 self._lexicon = lexicon_constructor(self.id)
                 self._entry = entry_constructor(self.id)
