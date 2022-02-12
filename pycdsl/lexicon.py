@@ -246,7 +246,34 @@ class CDSLDict:
     # ----------------------------------------------------------------------- #
 
     def connect(self, lexicon_model=None, entry_model=None, model_map=None):
-        """Connect to the SQLite database"""
+        """
+        Connect to the SQLite database
+
+        If both `lexicon_model` and `entry_model` are specified,
+        they are used as the ORM layer, and take preference over `model_map`.
+
+        If any of `lexicon_model` or `entry_model` is None,
+        then the models are resolved in the following way.
+
+        First, if the current dictionary ID is present in `model_map` the
+        models specified by the `model_map` are used.
+        Otherwise, `models.lexicon_constructor` and `models.entry_constructor`
+        functions are used, which subclass the `models.Lexicon` and
+        `models.Entry` models.
+
+        Parameters
+        ----------
+        lexicon_model : object, optional
+            Lexicon model.
+            The default is None.
+        entry_model : object, optional
+            Entry model.
+            The default is None.
+        model_map : dict, optional
+            Map of dictionary ID to a tuple of lexicon model and entry model
+            If None, the default map `MODEL_MAP` will be used.
+            The default is None.
+        """
         if lexicon_model is not None and entry_model is not None:
             self._lexicon = lexicon_model
             self._entry = entry_model
