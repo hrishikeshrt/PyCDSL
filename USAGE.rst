@@ -107,6 +107,31 @@ Change transliteration scheme for a dictionary:
     CDSL.MW.set_scheme(input_scheme="itrans")
     CDSL.MW.search("rAma")
 
+Classes :code:`CDSLCorpus` and :code:`CDSLDict` are iterable.
+
+* Iterating over :code:`CDSLCorpus` yields loaded dictionary instances.
+* Iterating over :code:`CDSLDict` yields entries in that dictionary.
+
+.. code-block:: python
+
+    # Iteration over a `CDSLCorpus` instance
+
+    for cdsl_dict in CDSL:
+        print(type(cdsl_dict))
+        print(cdsl_dict)
+        break
+
+    # <class 'pycdsl.lexicon.CDSLDict'>
+    # CDSLDict(id='MW', date='1899', name='Monier-Williams Sanskrit-English Dictionary')
+
+    # Iteration over a `CDSLDict` isntance
+    for entry in CDSL.MW:
+        print(type(entry))
+        print(entry)
+
+    # <class 'pycdsl.models.MWEntry'>
+    # <MWEntry: 1: अ = 1. अ   the first letter of the alphabet>
+
 **Note**: Please check the documentation of modules in the PyCDSL Package for more
 detailed information on available classes and functions.
 
