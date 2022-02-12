@@ -12,18 +12,34 @@ pycdsl.cli module
    :undoc-members:
    :show-inheritance:
 
-pycdsl.models module
---------------------
+pycdsl.constants module
+-----------------------
 
-.. automodule:: pycdsl.models
+.. automodule:: pycdsl.constants
    :members:
    :undoc-members:
    :show-inheritance:
 
-pycdsl.pycdsl module
+pycdsl.corpus module
 --------------------
 
-.. automodule:: pycdsl.pycdsl
+.. automodule:: pycdsl.corpus
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pycdsl.lexicon module
+---------------------
+
+.. automodule:: pycdsl.lexicon
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pycdsl.models module
+--------------------
+
+.. automodule:: pycdsl.models
    :members:
    :undoc-members:
    :show-inheritance:
