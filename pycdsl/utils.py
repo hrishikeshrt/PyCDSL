@@ -31,11 +31,13 @@ def validate_scheme(scheme):
         otherwise, None.
     """
     if scheme is not None:
-        scheme = scheme.lower() if scheme.lower() in SCHEMES else None
-        if scheme is None:
+        _scheme = scheme.lower() if scheme.lower() in SCHEMES else None
+        if _scheme is None:
             LOGGER.warning(f"Invalid transliteration scheme '{scheme}'.")
+    else:
+        _scheme = None
 
-    return scheme
+    return _scheme
 
 
 def transliterate_between(
