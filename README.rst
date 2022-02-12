@@ -175,6 +175,7 @@ Classes :code:`CDSLCorpus` and :code:`CDSLDict` are iterable.
     for entry in CDSL.MW:
         print(type(entry))
         print(entry)
+        break
 
     # <class 'pycdsl.models.MWEntry'>
     # <MWEntry: 1: अ = 1. अ   the first letter of the alphabet>
