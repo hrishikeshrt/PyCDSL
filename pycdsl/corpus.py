@@ -36,7 +36,7 @@ class CDSLCorpus:
 
     Refers to a CDSL installation instance at the location `data_dir`.
     """
-    data_dir: str = field(default=None)
+    data_dir: str or Path = field(default=None)
     input_scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     output_scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
