@@ -2,33 +2,30 @@
 # -*- coding: utf-8 -*-
 """Tests for `pycdsl.utils`"""
 
-import logging
+import pytest
 from pycdsl.utils import validate_scheme, transliterate_between
 
 
-def test_validate_scheme(caplog):
-    assert validate_scheme("devanagari") == "devanagari"
-    assert validate_scheme("IAST") == "iast"
-    assert validate_scheme("invalid-scheme-1") is None
-    assert validate_scheme(None) is None
-    assert validate_scheme("invalid-scheme-2") is None
-
-    assert caplog.record_tuples == [
-        (
-            "pycdsl.utils",
-            logging.WARNING,
-            "Invalid transliteration scheme 'invalid-scheme-1'."
-        ),
-        (
-            "pycdsl.utils",
-            logging.WARNING,
-            "Invalid transliteration scheme 'invalid-scheme-2'."
-        )
-    ]
+@pytest.mark.parametrize("input_scheme,result,log_messages", [
+    ("devanagari", "devanagari", []),
+    ("IAST", "iast", []),
+    ("Velthuis", "velthuis", []),
+    ("invalid-1", None, ["Invalid transliteration scheme 'invalid-1'."]),
+    ("invalid-2", None, ["Invalid transliteration scheme 'invalid-2'."]),
+    (None, None, [])
+])
+def test_validate_scheme(caplog, input_scheme, result, log_messages):
+    assert validate_scheme(input_scheme) == result
+    assert caplog.messages == log_messages
 
 
-def test_transliterate_between():
-    text = "Lord <s>रामः</s> was a <s>राजा</s> of <s>अयोध्या</s>."
-    correct_output = "Lord <s>rāmaḥ</s> was a <s>rājā</s> of <s>ayodhyā</s>."
-    output = transliterate_between(text, 'devanagari', 'iast', r"<s>", r"</s>")
-    assert output == correct_output
+@pytest.mark.parametrize("text,_from,_to,_start,_end,result", [
+    ("Lord <s>रामः</s> was a <s>राजा</s> of <s>अयोध्या</s> इति श्रूयते",
+     "devanagari", "iast", r"<s>", r"</s>",
+     "Lord <s>rāmaḥ</s> was a <s>rājā</s> of <s>ayodhyā</s> इति श्रूयते"),
+    ("Lord <s>रामः</s> of <s>अयोध्या</s>.",
+     "devanagari", "devanagari", r"<s>", r"</s>",
+     "Lord <s>रामः</s> of <s>अयोध्या</s>."),
+])
+def test_transliterate_between(text, _from, _to, _start, _end, result):
+    assert result == transliterate_between(text, _from, _to, _start, _end)
