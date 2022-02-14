@@ -11,7 +11,7 @@ Python Interface to Cologne Digital Sanskrit Lexicon (CDSL).
 
 __author__ = "Hrishikesh Terdalkar"
 __email__ = 'hrishikeshrt@linuxmail.org'
-__version__ = '0.5.1'
+__version__ = '0.6.0'
 
 ###############################################################################
 
