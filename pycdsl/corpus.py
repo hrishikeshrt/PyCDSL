@@ -54,13 +54,19 @@ class CDSLCorpus:
         self.dicts = {}
         self.get_available_dicts()
 
+    # ----------------------------------------------------------------------- #
+
     def __getattr__(self, attr: str):
         if attr in self.dicts:
             return self.dicts[attr]
         else:
             raise AttributeError
 
-    # ----------------------------------------------------------------------- #
+    def __getitem__(self, item):
+        if item in self.dicts:
+            return self.dicts[item]
+        else:
+            raise KeyError(f"Dictionary '{item}' is not setup.")
 
     def __iter__(self):
         yield from self.dicts.values()
