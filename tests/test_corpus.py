@@ -80,13 +80,34 @@ def test_installed_dicts(installed_dicts, installation_list):
     assert list(installed_dicts) == installation_list
 
 
-def test_corpus_attribute(ready_corpus, installation_list):
+def test_corpus_getattr(ready_corpus, installation_list):
     for installed_dict in installation_list:
         assert hasattr(ready_corpus, installed_dict)
         assert (
             getattr(ready_corpus, installed_dict)
             is ready_corpus.dicts[installed_dict]
         )
+    with pytest.raises(AttributeError) as exc_info:
+        getattr(ready_corpus, 'invalid_dictionary_id')
+    assert exc_info.type is AttributeError
+
+
+def test_corpus_getitem(ready_corpus, installation_list):
+    for installed_dict in installation_list:
+        assert (
+            ready_corpus[installed_dict]
+            is ready_corpus.dicts[installed_dict]
+        )
+    with pytest.raises(KeyError) as exc_info:
+        ready_corpus['invalid_dictionary_id']
+    assert exc_info.type is KeyError
+
+
+def test_corpus_iteration(ready_corpus, installation_list):
+    for cdsl_dict in ready_corpus:
+        assert isinstance(cdsl_dict, CDSLDict)
+
+    assert set(_dict.id for _dict in ready_corpus) == set(installation_list)
 
 
 @pytest.mark.parametrize("pattern,limit", [("अ", 1), ("राम", 1)])
