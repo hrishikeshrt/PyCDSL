@@ -67,6 +67,13 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
+    def __getitem__(self, item):
+        result = self.entry(item)
+        if result is None:
+            raise KeyError(f"Entry with ID '{item}' not found.")
+        else:
+            return result
+
     def __iter__(self):
         for entry in self._lexicon.select():
             yield self._entry(
@@ -422,7 +429,7 @@ class CDSLDict:
                 transliterate_keys=self.transliterate_keys
             )
         except Exception:
-            LOGGER.error(f"No entry with ID '{entry_id}' was found")
+            LOGGER.error(f"Entry with ID '{entry_id}' not found.")
 
     def dump(self, output_path=None, output_scheme=None):
         """
