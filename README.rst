@@ -96,17 +96,19 @@ Search in a dictionary:
 
 .. code-block:: python
 
-    # Any loaded dictionary is accessible through `dicts` using dictionary ID
-    # e.g. CDSL.dicts["MW"]
-    results = CDSL.dicts["MW"].search("राम")
+    # Any loaded dictionary is accessible using `[]` operator and dictionary ID
+    # e.g. CDSL["MW"]
+    results = CDSL["MW"].search("राम")
 
     # Alternatively, they are also accessible like an attribute
     # e.g. CDSL.MW, CDSL.MWE etc.
     results = CDSL.MW.search("राम")
 
-    # Note: Attribute access actually uses the `dicts` property under the hood
-    # to access the dictionaries.
+    # Note: Attribute access and Item access both use the `dicts` property
+    # under the hood to access the dictionaries.
     # >>> CDSL.MW is CDSL.dicts["MW"]
+    # True
+    # >>> CDSL["MW"] is CDSL.dicts["MW"]
     # True
 
     # `input_scheme` and `output_scheme` can be specified to the search function.
@@ -127,7 +129,16 @@ Access an entry by ID:
 
 .. code-block:: python
 
+    # Access entry by `entry_id` using `[]` operator
+    entry = CDSL.MW["263938"]
+
+    # Alternatively, use `CDSLDict.entry` function
     entry = CDSL.MW.entry("263938")
+
+    # Note: Access using `[]` operator calls the `CDSLDict.entry` function.
+    # The difference is that, in case an `entry_id` is absent,
+    # `[]` based access will raise a `KeyError`
+    # `CDSLDict.entry` will return None and log a `logging.ERROR` level message
 
     # >>> entry
     # <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
