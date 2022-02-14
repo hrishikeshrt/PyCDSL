@@ -9,10 +9,12 @@ CDSL Corpus Management
 import logging
 from pathlib import Path
 from dataclasses import dataclass, field
+from typing import Dict, Generator, List
 
 import bs4
 import requests
 
+from .models import Entry
 from .lexicon import CDSLDict
 from .constants import (
     SERVER_URL,
@@ -56,24 +58,24 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
-    def __getattr__(self, attr: str):
+    def __getattr__(self, attr: str) -> CDSLDict:
         if attr in self.dicts:
             return self.dicts[attr]
         else:
             raise AttributeError
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> CDSLDict:
         if item in self.dicts:
             return self.dicts[item]
         else:
             raise KeyError(f"Dictionary '{item}' is not setup.")
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[CDSLDict, None, None]:
         yield from self.dicts.values()
 
     # ----------------------------------------------------------------------- #
 
-    def setup(self, dict_ids: list = None, update: bool = False):
+    def setup(self, dict_ids: list = None, update: bool = False) -> bool:
         """Setup CDSL dictionaries in bulk
 
         Calls `CDSLDict.setup()` on every `CDSLDict`, and if successful, also
@@ -135,15 +137,15 @@ class CDSLCorpus:
 
     def search(
         self,
-        pattern,
-        dict_ids=None,
-        input_scheme=None,
-        output_scheme=None,
-        ignore_case=False,
-        limit=None,
-        offset=None,
-        omit_empty=True
-    ):
+        pattern: str,
+        dict_ids: List[str] = None,
+        input_scheme: str = None,
+        output_scheme: str = None,
+        ignore_case: bool = False,
+        limit: int = None,
+        offset: int = None,
+        omit_empty: bool = True
+    ) -> Dict[str, List[Entry]]:
         """Search in multiple dictionaries from the corpus
 
         Parameters
@@ -213,7 +215,7 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
-    def get_available_dicts(self):
+    def get_available_dicts(self) -> Dict[str, CDSLDict]:
         """
         Fetch a list of dictionaries available for download from CDSL
 
@@ -253,7 +255,7 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
-    def get_installed_dicts(self):
+    def get_installed_dicts(self) -> Dict[str, CDSLDict]:
         """Fetch a list of dictionaries installed locally"""
         dictionaries = {}
         dict_ids = [path.name for path in self.dict_dir.glob("*")]

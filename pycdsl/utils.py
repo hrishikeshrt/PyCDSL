@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 ###############################################################################
 
 
-def validate_scheme(scheme):
+def validate_scheme(scheme: str) -> str or None:
     """Validate the name of transliteration scheme
 
     Parameters
@@ -41,8 +41,12 @@ def validate_scheme(scheme):
 
 
 def transliterate_between(
-    text, from_scheme, to_scheme, start_pattern, end_pattern
-):
+    text: str,
+    from_scheme: str,
+    to_scheme: str,
+    start_pattern: str,
+    end_pattern: str
+) -> str:
     """Transliterate the text appearing between two patterns
 
     Only the text appearing between patterns `start_pattern` and `end_pattern`

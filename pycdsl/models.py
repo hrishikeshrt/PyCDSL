@@ -10,10 +10,9 @@ Models for Lexicon Access
 
 import logging
 from functools import lru_cache
+from typing import Dict
 
-from peewee import (DatabaseProxy, Model,
-                    DecimalField, CharField, TextField)
-# from playhouse.shortcuts import model_to_dict
+from peewee import DatabaseProxy, Model, DecimalField, CharField, TextField
 
 import bs4
 from indic_transliteration import sanscript
@@ -34,7 +33,7 @@ class Lexicon(Model):
     key = CharField(index=True)
     data = TextField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'{self.id}: {self.key}'
 
     class Meta:
@@ -49,7 +48,12 @@ class Entry:
 
     Wraps instances of Lexicon model which respresent query results
     """
-    def __init__(self, lexicon_entry, scheme=None, transliterate_keys=True):
+    def __init__(
+        self,
+        lexicon_entry: Lexicon,
+        scheme: str = None,
+        transliterate_keys: bool = True
+    ):
         """
         Lexicon Entry
 
@@ -96,7 +100,11 @@ class Entry:
         self._soup = bs4.BeautifulSoup(self.data, 'xml')
         self._body = self._soup.find('body')
 
-    def transliterate(self, scheme=DEFAULT_SCHEME, transliterate_keys=True):
+    def transliterate(
+        self,
+        scheme: str = DEFAULT_SCHEME,
+        transliterate_keys: bool = True
+    ):
         """Transliterate Data
 
         Part of the `data` in lexicon that is enclosed in `<s>` tags
@@ -124,11 +132,11 @@ class Entry:
         )
 
     @lru_cache(maxsize=1)
-    def meaning(self):
+    def meaning(self) -> str:
         """Extract meaning of the entry"""
         return self._body.get_text().strip()
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, str]:
         """Get a python `dict` representation of the entry"""
         return {
             "id": str(self.id),
@@ -140,7 +148,7 @@ class Entry:
     def parse(self):
         raise NotImplementedError
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         classname = self.__class__.__qualname__
         return f'<{classname}: {self.id}: {self.key} = {self.meaning()}>'
 
@@ -148,7 +156,7 @@ class Entry:
 ###############################################################################
 
 
-def lexicon_constructor(dict_id, table_name=None):
+def lexicon_constructor(dict_id: str, table_name: str = None) -> Lexicon:
     """Construct a Lexicon Model
 
     Parameters
@@ -163,7 +171,7 @@ def lexicon_constructor(dict_id, table_name=None):
     Returns
     -------
     object
-        Constructed class for lexicon
+        Constructed class (a subclass of `Lexicon`) for a dictionary
     """
     table_name = table_name or dict_id.lower()
     class_dict = {
@@ -173,7 +181,7 @@ def lexicon_constructor(dict_id, table_name=None):
     return type(f"{dict_id}Lexicon", bases, class_dict)
 
 
-def entry_constructor(dict_id):
+def entry_constructor(dict_id: str) -> Entry:
     """Construct an Entry Model
 
     Parameters
@@ -184,7 +192,7 @@ def entry_constructor(dict_id):
     Returns
     -------
     object
-        Constructed class for dictionary entry
+        Constructed class (a subclass of `Entry`) for a dictionary entry
     """
     return type(f"{dict_id}Entry", (Entry,), {})
 

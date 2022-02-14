@@ -10,6 +10,7 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from functools import lru_cache
 import zipfile
+from typing import Dict, Generator, List, Tuple
 
 from peewee import fn
 from playhouse.db_url import connect
@@ -21,6 +22,7 @@ from indic_transliteration.sanscript import transliterate
 
 from .utils import validate_scheme
 from .models import (
+    Lexicon, Entry,
     MWLexicon, MWEntry,
     AP90Lexicon, AP90Entry,
     lexicon_constructor, entry_constructor
@@ -67,14 +69,14 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: str) -> Entry:
         result = self.entry(item)
         if result is None:
             raise KeyError(f"Entry with ID '{item}' not found.")
         else:
             return result
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[Entry, None, None]:
         for entry in self._lexicon.select():
             yield self._entry(
                 entry,
@@ -84,7 +86,7 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    def download(self, download_dir):
+    def download(self, download_dir: str or Path) -> bool:
         """Download and extract dictionary data
 
         Parameters
@@ -160,7 +162,12 @@ class CDSLDict:
             LOGGER.info(f"Data for dictionary '{self.id}' is up-to-date.")
         return True
 
-    def setup(self, data_dir, symlink_dir=None, update=False):
+    def setup(
+        self,
+        data_dir: str or Path,
+        symlink_dir: str or Path = None,
+        update: bool = False
+    ) -> bool:
         """Setup the dictionary database path
 
         Parameters
@@ -211,9 +218,9 @@ class CDSLDict:
 
     def set_scheme(
         self,
-        input_scheme=None,
-        output_scheme=None,
-        transliterate_keys=None
+        input_scheme: str = None,
+        output_scheme: str = None,
+        transliterate_keys: bool = None
     ):
         """Set transliteration scheme for the dictionary instance
 
@@ -252,7 +259,12 @@ class CDSLDict:
 
     # ----------------------------------------------------------------------- #
 
-    def connect(self, lexicon_model=None, entry_model=None, model_map=None):
+    def connect(
+        self,
+        lexicon_model: Lexicon = None,
+        entry_model: Entry = None,
+        model_map: Dict[str, Tuple[Lexicon, Entry]] = None
+    ):
         """
         Connect to the SQLite database
 
@@ -301,7 +313,7 @@ class CDSLDict:
     # ----------------------------------------------------------------------- #
 
     @lru_cache(maxsize=1)
-    def stats(self, top=10):
+    def stats(self, top: int = 10) -> Dict:
         """Display statistics about the lexicon
 
         Parameters
@@ -350,13 +362,13 @@ class CDSLDict:
     @lru_cache(maxsize=4096)
     def search(
         self,
-        pattern,
-        input_scheme=None,
-        output_scheme=None,
-        ignore_case=False,
-        limit=None,
-        offset=None
-    ):
+        pattern: str,
+        input_scheme: str = None,
+        output_scheme: str = None,
+        ignore_case: str = False,
+        limit: int = None,
+        offset: int = None
+    ) -> List[Entry]:
         """Search in the dictionary
 
         Parameters
@@ -403,7 +415,7 @@ class CDSLDict:
             for result in search_query.limit(limit).offset(offset)
         ]
 
-    def entry(self, entry_id, output_scheme=None):
+    def entry(self, entry_id: str, output_scheme: str = None) -> Entry or None:
         """Get an entry by ID
 
         Parameters
@@ -418,7 +430,8 @@ class CDSLDict:
         Returns
         -------
         object
-            Lexicon Entry
+            If the `entry_id` is valid, `Entry` with the matching ID
+            otherwise, None.
         """
 
         output_scheme = validate_scheme(output_scheme) or self.output_scheme
@@ -431,13 +444,17 @@ class CDSLDict:
         except Exception:
             LOGGER.error(f"Entry with ID '{entry_id}' not found.")
 
-    def dump(self, output_path=None, output_scheme=None):
+    def dump(
+        self,
+        output_path: str or Path = None,
+        output_scheme: str = None
+    ) -> List[Dict[str, str]]:
         """
         Dump data as JSON
 
         Parameters
         ----------
-        output_path : str or None, optional
+        output_path : str or Path, optional
             Path to the output JSON file.
             If None, the data isn't written to the disk, only returned.
             The default is None.

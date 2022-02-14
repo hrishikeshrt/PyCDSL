@@ -7,6 +7,7 @@
 import os
 import cmd
 import logging
+from typing import List
 
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
@@ -51,10 +52,10 @@ class CDSLShell(BasicShell):
 
     def __init__(
         self,
-        data_dir=None,
-        dict_ids=None,
-        input_scheme=None,
-        output_scheme=None
+        data_dir: str = None,
+        dict_ids: List[str] = None,
+        input_scheme: str = None,
+        output_scheme: str = None
     ):
         """REPL Interface to CDSL
 
