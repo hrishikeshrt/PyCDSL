@@ -85,45 +85,54 @@ def main():
 
     args = vars(parser.parse_args())
 
-    if args.get('debug'):
+    # arguments
+    data_dir = args.get("path")
+    dict_ids = args.get("dicts")
+    input_scheme = args.get("input_scheme")
+    output_scheme = args.get("output_scheme")
+
+    flag_update = args.get("update")
+    flag_debug = args.get("debug")
+    flag_interactive = args.get("interactive")
+
+    search_pattern = args.get("search")
+
+    # debug
+    if flag_debug:
         ROOT_LOGGER.setLevel(logging.DEBUG)
 
-    if args.get("interactive"):
+    if flag_interactive:
+        # interactive
         cdsl_shell = CDSLShell(
-            data_dir=args.get("path"),
-            dict_ids=args.get("dicts"),
-            input_scheme=args.get("input_scheme"),
-            output_scheme=args.get("output_scheme")
+            data_dir=data_dir,
+            dict_ids=dict_ids,
+            input_scheme=input_scheme,
+            output_scheme=output_scheme
         )
-        if args.get("update"):
-            cdsl_shell.cdsl.setup(dict_ids=args.get("dicts"), update=True)
+        cdsl_shell.cdsl.setup(dict_ids=dict_ids, update=flag_update)
         cdsl_shell.cmdloop()
     else:
+        # non-interactive shell command
         cdsl = CDSLCorpus(
-            data_dir=args.get("path"),
-            input_scheme=args.get("input_scheme"),
-            output_scheme=args.get("output_scheme")
+            data_dir=data_dir,
+            input_scheme=input_scheme,
+            output_scheme=output_scheme
         )
+        cdsl.setup(dict_ids=dict_ids, update=flag_update)
 
-        cdsl.setup(args.get("dicts"), update=args.get("update"))
-
-        if not args.get("update") and not args.get("search"):
-            ROOT_LOGGER.error(
-                "Must specify a search pattern in non-interactive mode."
-            )
+        if not flag_update and not search_pattern:
+            print("Must specify a search pattern in non-interactive mode.")
             parser.print_help()
             return 1
 
-        if args.get("search"):
-            all_results = cdsl.search(
-                pattern=args.get("search"),
-                dict_ids=args.get("dicts"),
-            )
+        # search
+        if search_pattern:
+            all_results = cdsl.search(pattern=search_pattern)
             for dict_id, dict_results in all_results.items():
-                result_count = len(dict_results)
+                n_results = len(dict_results)
                 print(
                     "\n"
-                    f"Found {result_count} results in the dictionary '{dict_id}'."
+                    f"Found {n_results} results in the dictionary '{dict_id}'."
                     "\n"
                 )
                 for result in dict_results:
