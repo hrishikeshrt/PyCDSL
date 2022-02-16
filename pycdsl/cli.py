@@ -99,13 +99,6 @@ def main():
             cdsl_shell.cdsl.setup(dict_ids=args.get("dicts"), update=True)
         cdsl_shell.cmdloop()
     else:
-        if not args.get("search"):
-            ROOT_LOGGER.error(
-                "Must specify a search pattern in non-interactive mode."
-            )
-            parser.print_help()
-            return 1
-
         cdsl = CDSLCorpus(
             data_dir=args.get("path"),
             input_scheme=args.get("input_scheme"),
@@ -113,19 +106,28 @@ def main():
         )
 
         cdsl.setup(args.get("dicts"), update=args.get("update"))
-        all_results = cdsl.search(
-            pattern=args.get("search"),
-            dict_ids=args.get("dicts"),
-        )
-        for dict_id, dict_results in all_results.items():
-            result_count = len(dict_results)
-            print(
-                "\n"
-                f"Found {result_count} results in the dictionary '{dict_id}'."
-                "\n"
+
+        if not args.get("update") and not args.get("search"):
+            ROOT_LOGGER.error(
+                "Must specify a search pattern in non-interactive mode."
             )
-            for result in dict_results:
-                print(result)
+            parser.print_help()
+            return 1
+
+        if args.get("search"):
+            all_results = cdsl.search(
+                pattern=args.get("search"),
+                dict_ids=args.get("dicts"),
+            )
+            for dict_id, dict_results in all_results.items():
+                result_count = len(dict_results)
+                print(
+                    "\n"
+                    f"Found {result_count} results in the dictionary '{dict_id}'."
+                    "\n"
+                )
+                for result in dict_results:
+                    print(result)
 
     return 0
 
