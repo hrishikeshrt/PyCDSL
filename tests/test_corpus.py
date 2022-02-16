@@ -4,57 +4,8 @@
 
 import pytest
 
-from pycdsl.corpus import SERVER_URL, CDSLCorpus
 from pycdsl.lexicon import CDSLDict
 from pycdsl.models import Entry
-
-###############################################################################
-
-
-@pytest.fixture(scope="package")
-def cdsl_homepage():
-    """Fixture for CDSL Homepage"""
-    import requests
-    return requests.get(SERVER_URL)
-
-
-@pytest.fixture(scope="package")
-def default_path(tmp_path_factory):
-    return tmp_path_factory.mktemp("cdsl_data")
-
-
-@pytest.fixture(scope="package")
-def default_corpus_options(default_path):
-    return {
-        'data_dir': default_path
-    }
-
-
-@pytest.fixture(scope="package")
-def default_corpus(default_corpus_options):
-    return CDSLCorpus(**default_corpus_options)
-
-
-@pytest.fixture(scope="package")
-def available_dicts(default_corpus):
-    return default_corpus.get_available_dicts()
-
-
-@pytest.fixture(scope="package")
-def installation_list():
-    return ["WIL"]
-
-
-@pytest.fixture(scope="package")
-def ready_corpus(default_corpus, installation_list):
-    default_corpus.setup(installation_list)
-    return default_corpus
-
-
-@pytest.fixture(scope="package")
-def installed_dicts(ready_corpus):
-    return ready_corpus.get_installed_dicts()
-
 
 ###############################################################################
 
@@ -73,6 +24,16 @@ def test_available_dicts(available_dicts):
     for dict_id, cdsl_dict in available_dicts.items():
         assert dict_id == cdsl_dict.id
         assert isinstance(cdsl_dict, CDSLDict)
+
+
+def test_corpus_setup(default_corpus, installation_list):
+    assert default_corpus.setup(installation_list) is True
+
+
+def test_corpus_setup_error_1(default_corpus, installation_list, caplog):
+    with pytest.raises(ValueError) as exc_info:
+        default_corpus.setup(installation_list[0])
+    assert exc_info.type is ValueError
 
 
 def test_installed_dicts(installed_dicts, installation_list):
