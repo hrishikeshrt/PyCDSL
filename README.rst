@@ -366,3 +366,11 @@ REPL Session Example
     (CDSL::MW+4) exit
 
     Bye
+
+
+Credits
+=======
+
+This application uses data from `Cologne Digital Sanskrit Dictionaries`_, Cologne University.
+
+.. _`Cologne Digital Sanskrit Dictionaries`: https://www.sanskrit-lexicon.uni-koeln.de/
