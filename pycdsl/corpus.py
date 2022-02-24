@@ -9,12 +9,16 @@ CDSL Corpus Management
 import logging
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, Generator, List
+from typing import Dict, Generator, List, Tuple
 
 import bs4
 import requests
 
-from .models import Entry
+from .models import (
+    Lexicon, Entry,
+    MWLexicon, MWEntry,
+    AP90Lexicon, AP90Entry
+)
 from .lexicon import CDSLDict
 from .constants import (
     SERVER_URL,
@@ -23,6 +27,13 @@ from .constants import (
     ENGLISH_DICTIONARIES,
     DEFAULT_SCHEME,
 )
+
+###############################################################################
+
+DEFAULT_MODEL_MAP = {
+    "MW": (MWLexicon, MWEntry),
+    "AP90": (AP90Lexicon, AP90Entry),
+}
 
 ###############################################################################
 
@@ -75,7 +86,12 @@ class CDSLCorpus:
 
     # ----------------------------------------------------------------------- #
 
-    def setup(self, dict_ids: list = None, update: bool = False) -> bool:
+    def setup(
+        self,
+        dict_ids: list = None,
+        update: bool = False,
+        model_map: Dict[str, Tuple[Lexicon, Entry]] = None
+    ) -> bool:
         """Setup CDSL dictionaries in bulk
 
         Calls `CDSLDict.setup()` on every `CDSLDict`, and if successful, also
@@ -92,6 +108,18 @@ class CDSLCorpus:
             If True, and update check is performed for every dictionary in
             `dict_ids`, and if available, the updated version is installed
             The default is False.
+        lexicon_model : object, optional
+            Lexicon model argument passed to `CDSLDict.connect()`
+            The default is None.
+        entry_model : object, optional
+            Entry model argument passed to `CDSLDict.connect()`
+            The default is None.
+        model_map : dict, optional
+            Map of dictionary ID to a tuple of lexicon model and entry model.
+            The argument is used to specify `lexicon_model` and `entry_model`
+            arguments passed to `CDSLDict.connect()`.
+            If None, the default map `DEFAULT_MODEL_MAP` will be used.
+            The default is None.
 
         Returns
         -------
@@ -128,7 +156,18 @@ class CDSLCorpus:
             )
             status.append(success)
             if success:
-                cdsl_dict.connect()
+                if model_map is None:
+                    model_map = DEFAULT_MODEL_MAP
+
+                lexicon_model, entry_model = model_map.get(
+                    cdsl_dict.id,
+                    (None, None)
+                )
+
+                cdsl_dict.connect(
+                    lexicon_model=lexicon_model,
+                    entry_model=entry_model
+                )
                 self.dicts[dict_id] = cdsl_dict
 
         return bool(status) and all(status)

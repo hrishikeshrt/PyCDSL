@@ -10,7 +10,7 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from functools import lru_cache
 import zipfile
-from typing import Dict, Generator, List, Tuple
+from typing import Dict, Generator, List
 
 from peewee import fn
 from playhouse.db_url import connect
@@ -23,8 +23,6 @@ from indic_transliteration.sanscript import transliterate
 from .utils import validate_scheme
 from .models import (
     Lexicon, Entry,
-    MWLexicon, MWEntry,
-    AP90Lexicon, AP90Entry,
     lexicon_constructor, entry_constructor
 )
 from .constants import (
@@ -35,13 +33,6 @@ from .constants import (
 ###############################################################################
 
 LOGGER = logging.getLogger(__name__)
-
-###############################################################################
-
-DEFAULT_MODEL_MAP = {
-    "MW": (MWLexicon, MWEntry),
-    "AP90": (AP90Lexicon, AP90Entry),
-}
 
 ###############################################################################
 
@@ -262,8 +253,7 @@ class CDSLDict:
     def connect(
         self,
         lexicon_model: Lexicon = None,
-        entry_model: Entry = None,
-        model_map: Dict[str, Tuple[Lexicon, Entry]] = None
+        entry_model: Entry = None
     ):
         """
         Connect to the SQLite database
@@ -288,22 +278,13 @@ class CDSLDict:
         entry_model : object, optional
             Entry model.
             The default is None.
-        model_map : dict, optional
-            Map of dictionary ID to a tuple of lexicon model and entry model
-            If None, the default map `MODEL_MAP` will be used.
-            The default is None.
         """
         if lexicon_model is not None and entry_model is not None:
             self._lexicon = lexicon_model
             self._entry = entry_model
         else:
-            if model_map is None:
-                model_map = DEFAULT_MODEL_MAP
-            if self.id in model_map:
-                self._lexicon, self._entry = model_map[self.id]
-            else:
-                self._lexicon = lexicon_constructor(self.id)
-                self._entry = entry_constructor(self.id)
+            self._lexicon = lexicon_constructor(self.id)
+            self._entry = entry_constructor(self.id)
 
         db_url = f"sqlite:///{self.db}"
         self._lexicon.bind(connect(db_url))
