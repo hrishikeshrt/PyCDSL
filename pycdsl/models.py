@@ -99,6 +99,11 @@ class Entry:
 
         self._soup = bs4.BeautifulSoup(self.data, 'xml')
         self._body = self._soup.find('body')
+        self.__post_init__()
+
+    def __post_init__(self):
+        """Placeholder to implement a custom post-init hook"""
+        pass
 
     def transliterate(
         self,
