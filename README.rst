@@ -35,7 +35,6 @@ PyCDSL is a python interface to `Cologne Digital Sanskrit Lexicon (CDSL)`_.
 * Free software: GNU General Public License v3
 * Documentation: https://pycdsl.readthedocs.io.
 
-
 Features
 ========
 
@@ -44,6 +43,14 @@ Features
 * Console Command and REPL Interface for easy dictionary search
 * Extensive support for transliteration using :code:`indic-transliteration` module
 
+Install
+=======
+
+To install PyCDSL, run this command in your terminal:
+
+.. code-block:: console
+
+    $ pip install PyCDSL
 
 Usage
 =====
