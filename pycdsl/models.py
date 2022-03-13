@@ -51,6 +51,7 @@ class Entry:
     def __init__(
         self,
         lexicon_entry: Lexicon,
+        lexicon_id: str = None,
         scheme: str = None,
         transliterate_keys: bool = True
     ):
@@ -61,6 +62,8 @@ class Entry:
         ----------
         lexicon_entry : Lexicon
             Instance of Lexicon model
+        lexicon_id : str, optional
+            ID of the Lexicon to which the entry belongs
         scheme : str, optional
             Output transliteration scheme.
             If valid, parts of the `data` in lexicon which are enclosed in
@@ -76,6 +79,11 @@ class Entry:
         self.id = self._entry.id
         self.key = self._entry.key
         self.data = self._entry.data
+
+        if lexicon_id is None:
+            lexicon_id = self.__class__.__name__.split("Entry")[0]
+
+        self.lexicon_id = lexicon_id
 
         # Validate Scheme
         valid_scheme = validate_scheme(scheme) or INTERNAL_SCHEME
@@ -144,6 +152,7 @@ class Entry:
     def to_dict(self) -> Dict[str, str]:
         """Get a python `dict` representation of the entry"""
         return {
+            "lexicon": self.lexicon_id,
             "id": str(self.id),
             "key": self.key,
             "data": self.data,

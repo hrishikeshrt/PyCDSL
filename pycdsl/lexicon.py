@@ -71,6 +71,7 @@ class CDSLDict:
         for entry in self._lexicon.select():
             yield self._entry(
                 entry,
+                lexicon_id=self.id,
                 scheme=self.output_scheme,
                 transliterate_keys=self.transliterate_keys
             )
@@ -390,6 +391,7 @@ class CDSLDict:
         return [
             self._entry(
                 result,
+                lexicon_id=self.id,
                 scheme=output_scheme,
                 transliterate_keys=self.transliterate_keys
             )
@@ -419,6 +421,7 @@ class CDSLDict:
         try:
             return self._entry(
                 self._lexicon.get(self._lexicon.id == entry_id),
+                lexicon_id=self.id,
                 scheme=output_scheme,
                 transliterate_keys=self.transliterate_keys
             )
@@ -456,6 +459,7 @@ class CDSLDict:
             for entry in (
                 self._entry(
                     result,
+                    lexicon_id=self.id,
                     scheme=output_scheme,
                     transliterate_keys=self.transliterate_keys
                 )
