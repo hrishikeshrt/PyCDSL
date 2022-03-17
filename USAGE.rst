@@ -207,8 +207,8 @@ REPL Session Example
 
     Documented commands (type help <topic>):
     ========================================
-    EOF        debug  exit  info          limit          shell  update  version
-    available  dicts  help  input_scheme  output_scheme  show   use
+    EOF        debug  exit  info          limit          shell  stats   use
+    available  dicts  help  input_scheme  output_scheme  show   update  version
 
     (CDSL::None) help available
     Display a list of dictionaries available in CDSL
@@ -285,6 +285,12 @@ REPL Session Example
     (CDSL::MW) info
     Total 1 dictionaries are active.
     CDSLDict(id='MW', date='1899', name='Monier-Williams Sanskrit-English Dictionary')
+
+    (CDSL::MW) stats
+    Total 1 dictionaries are active.
+    ---
+    CDSLDict(id='MW', date='1899', name='Monier-Williams Sanskrit-English Dictionary')
+    {'total': 287627, 'distinct': 194044, 'top': [('कृष्ण', 50), ('शिव', 46), ('विजय', 46), ('पुष्कर', 45), ('काल', 39), ('सिद्ध', 39), ('योग', 39), ('चित्र', 38), ('शुचि', 36), ('वसु', 36)]}
 
     (CDSL::MW) use WIL
 
