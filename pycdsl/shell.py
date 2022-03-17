@@ -115,12 +115,13 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
     # Debug Mode
 
-    def do_debug(self, arg):
+    def do_debug(self, arg: str):
         """Turn debug mode on/off"""
-        if arg.lower() in ["true", "on", "yes"]:
+        arg = arg.lower()
+        if arg in ["true", "on", "yes"]:
             self.debug = True
             self.logger.setLevel(logging.DEBUG)
-        if arg.lower() in ["false", "off", "no"]:
+        if arg in ["false", "off", "no"]:
             self.debug = False
             self.logger.setLevel(logging.INFO)
         print(f"Debug: {self.debug}")
@@ -134,7 +135,7 @@ class CDSLShell(BasicShell):
     def complete_output_scheme(self, text, line, begidx, endidx):
         return [sch for sch in self.schemes if sch.startswith(text)]
 
-    def do_input_scheme(self, scheme):
+    def do_input_scheme(self, scheme: str):
         """Change the input transliteration scheme"""
         if not scheme:
             print(f"Input scheme: {self.input_scheme}")
@@ -145,7 +146,7 @@ class CDSLShell(BasicShell):
                 self.input_scheme = scheme
                 print(f"Input scheme: {self.input_scheme}")
 
-    def do_output_scheme(self, scheme):
+    def do_output_scheme(self, scheme: str):
         """Change the output transliteration scheme"""
         if not scheme:
             print(f"Input scheme: {self.output_scheme}")
@@ -159,7 +160,7 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
     # Dictionary Information
 
-    def do_info(self, text=None):
+    def do_info(self, text: str = None):
         """Display information about active dictionaries"""
         if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
@@ -170,19 +171,19 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    def do_dicts(self, text=None):
+    def do_dicts(self, text: str = None):
         """Display a list of dictionaries available locally"""
         for _, cdsl_dict in self.cdsl.dicts.items():
             print(cdsl_dict)
 
-    def do_available(self, text=None):
+    def do_available(self, text: str = None):
         """Display a list of dictionaries available in CDSL"""
         for _, cdsl_dict in self.cdsl.available_dicts.items():
             print(cdsl_dict)
 
     # ----------------------------------------------------------------------- #
 
-    def do_update(self, text):
+    def do_update(self, text: str = None):
         """Update loaded dictionaries"""
         self.cdsl.setup(list(self.cdsl.dicts), update=True)
 
@@ -245,7 +246,7 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    def do_show(self, entry_id):
+    def do_show(self, entry_id: str):
         """Show a specific entry by ID"""
         if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
@@ -270,7 +271,7 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    def do_limit(self, text):
+    def do_limit(self, text: str):
         """Limit the number of search results per dictionary"""
         if text:
             try:
@@ -284,13 +285,13 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    def do_version(self, text):
+    def do_version(self, text: str = None):
         """Show the current version of PyCDSL"""
         print(f"PyCDSL v{__version__}")
 
     # ----------------------------------------------------------------------- #
 
-    def default(self, line):
+    def default(self, line: str):
         if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
         else:
@@ -312,7 +313,7 @@ class CDSLShell(BasicShell):
                         )
                     )
 
-    def cmdloop(self, intro=None):
+    def cmdloop(self, intro: str = None):
         print(self.intro)
         print(self.desc)
         self.cdsl.setup(dict_ids=self.dict_ids)
