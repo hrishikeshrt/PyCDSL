@@ -261,11 +261,23 @@ REPL Session Example
 
     Documented commands (type help <topic>):
     ========================================
-    EOF        debug  exit  info          limit          shell  stats   use
-    available  dicts  help  input_scheme  output_scheme  show   update  version
+    EOF        dicts  info          output_scheme  show    use
+    available  exit   input_scheme  search         stats   version
+    debug      help   limit         shell          update
 
     (CDSL::None) help available
     Display a list of dictionaries available in CDSL
+
+    (CDSL::None) help search
+
+        Search in the active dictionaries
+
+        Note
+        ----
+        * Searching in the active dictionaries is also the default action.
+        * In general, we do not need to use this command explicitly unless we
+          want to search the command keywords, such as, `available` `search`,
+          `version`, `help` etc. in the active dictionaries.
 
     (CDSL::None) help dicts
     Display a list of dictionaries available locally
