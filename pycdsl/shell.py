@@ -169,6 +169,17 @@ class CDSLShell(BasicShell):
             for active_dict in self.active_dicts:
                 print(active_dict)
 
+    def do_stats(self, text: str = None):
+        """Display statistics about active dictionaries"""
+        if self.active_dicts is None:
+            self.logger.error("Please select a dictionary first.")
+        else:
+            print(f"Total {len(self.active_dicts)} dictionaries are active.")
+            for active_dict in self.active_dicts:
+                print("---")
+                print(active_dict)
+                print(active_dict.stats(output_scheme=self.output_scheme))
+
     # ----------------------------------------------------------------------- #
 
     def do_dicts(self, text: str = None):

@@ -295,7 +295,7 @@ class CDSLDict:
     # ----------------------------------------------------------------------- #
 
     @lru_cache(maxsize=1)
-    def stats(self, top: int = 10) -> Dict:
+    def stats(self, top: int = 10, output_scheme: str = None) -> Dict:
         """Display statistics about the lexicon
 
         Parameters
@@ -303,12 +303,17 @@ class CDSLDict:
         top : int, optional
             Display top `top` entries having most different meanings.
             The default is 10.
+        output_scheme: str, optional
+            Output transliteration scheme
+            If None, `self.output_scheme` will be used.
+            The default is None.
 
         Returns
         -------
         dict
             Statistics about the dictionary
         """
+        output_scheme = validate_scheme(output_scheme) or self.output_scheme
         lex = self._lexicon
         total_count = lex.select().count()
         distinct_query = (
@@ -325,7 +330,7 @@ class CDSLDict:
                     transliterate(
                         item.key,
                         INTERNAL_SCHEME,
-                        self.output_scheme
+                        output_scheme
                     ) if self.transliterate_keys else item.key
                 ),
                 item.count
