@@ -313,10 +313,15 @@ REPL Session Example
     <MWEntry: 263937: hṛṣīkeśa = of a poet, ib.>
     <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
 
-    (CDSL::WIL,MW) use MW WIL AP90 MWE AE
-    Using 5 dictionaries: ['MW', 'WIL', 'AP90', 'MWE', 'AE']
+    (CDSL::WIL,MW) use MW AP90 MWE AE
+    Using 4 dictionaries: ['MW', 'AP90', 'MWE', 'AE']
 
-    (CDSL::MW+4) exit
+    (CDSL::MW+3) use ALL
+    Using 5 dictionaries: ['AP90', 'MW', 'MWE', 'AE', 'WIL']
 
+    (CDSL::AP90+3) use NONE
+    Using 0 dictionaries: []
+
+    (CDSL::None) exit
     Bye
 
