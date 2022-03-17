@@ -196,27 +196,48 @@ class CDSLShell(BasicShell):
             if dict_id.startswith(last_word)
         ]
 
-    def do_use(self, line):
+    def do_use(self, line: str):
         """
         Load the specified dictionaries from CDSL.
         If not available locally, they will be installed first.
-        """
-        dict_ids = line.upper().split()
 
-        self.active_dicts = []
-        for dict_id in dict_ids:
-            status = (dict_id in self.cdsl.dicts) or self.cdsl.setup([dict_id])
+        * `all` to load all
+        * `none` to unload all
+        """
+        line = line.upper().strip()
+        if not line:
+            print("Please provide dictionary ID(s) to use.")
+            return
+        if line == "NONE":
+            self.active_dicts = []
+        elif line == "ALL":
+            status = self.cdsl.setup()
             if status:
-                self.active_dicts.append(self.cdsl.dicts[dict_id])
+                self.active_dicts = self.cdsl.dicts.values()
             else:
-                self.logger.error(f"Couldn't setup dictionary '{dict_id}'.")
+                self.logger.error("Couldn't setup some dictionary.")
+        else:
+            dict_ids = line.split()
+            self.active_dicts = []
+            for dict_id in dict_ids:
+                status = (
+                    dict_id in self.cdsl.dicts
+                ) or self.cdsl.setup([dict_id])
+                if status:
+                    self.active_dicts.append(self.cdsl.dicts[dict_id])
+                else:
+                    self.logger.error(
+                        f"Couldn't setup dictionary '{dict_id}'."
+                    )
 
         active_count = len(self.active_dicts)
         active_ids = [active_dict.id for active_dict in self.active_dicts]
 
         print(f"Using {active_count} dictionaries: {active_ids}")
 
-        if active_count <= 3:
+        if active_count == 0:
+            active_prompt = "None"
+        elif active_count <= 3:
             active_prompt = ",".join(active_ids)
         else:
             active_prompt = f"{active_ids[0]}+{active_count - 1}"
