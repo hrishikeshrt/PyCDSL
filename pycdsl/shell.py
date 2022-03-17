@@ -302,7 +302,17 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    def default(self, line: str):
+    def do_search(self, line: str):
+        """
+        Search in the active dictionaries
+
+        Note
+        ----
+        * Searching in the active dictionaries is also the default action.
+        * In general, we do not need to use this command explicitly unless we
+          want to search the command keywords, such as, `available` `search`,
+          `version`, `help` etc. in the active dictionaries.
+        """
         if self.active_dicts is None:
             self.logger.error("Please select a dictionary first.")
         else:
@@ -323,6 +333,13 @@ class CDSLShell(BasicShell):
                             transliterate_keys=active_dict.transliterate_keys
                         )
                     )
+
+    # ----------------------------------------------------------------------- #
+
+    def default(self, line: str):
+        self.do_search(line)
+
+    # ----------------------------------------------------------------------- #
 
     def cmdloop(self, intro: str = None):
         print(self.intro)
