@@ -1,6 +1,19 @@
 History
 =======
 
+0.7.0 (2022-03-17)
+------------------
+* Add the explicit REPL command :code:`search`
+* Add a REPL command :code:`stats`
+* Interpret arguments :code:`all` and :code:`none` to the REPL command :code:`use`
+* Add :code:`lexicon_id` to :code:`Entry` class
+* Add a placeholder for post-init hook in :code:`Entry`. If implemented, this will be run after :code:`__init__()` of :code:`Entry`
+* Remove :code:`model_map` from :code:`CDSLDict` and add to :code:`CDSLCorpus`
+* Add tests for lexicon initalization, download, setup, transliteration, iteration, getitem, stats, entry, dump
+* Add credits to CDSL website
+* Update documentation
+* Fix bugs
+
 0.6.0 (2022-02-14)
 ------------------
 
