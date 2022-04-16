@@ -42,6 +42,7 @@ Features
 * Unified Programmable Interface to access all dictionaries available at CDSL
 * Console Command and REPL Interface for easy dictionary search
 * Extensive support for transliteration using :code:`indic-transliteration` module
+* Search by key, value or both
 
 Install
 =======
@@ -81,8 +82,16 @@ Create a CDSLCorpus Instance:
     # with arguments `input_scheme` and `output_scheme`.
     # Values should be valid names of the schemes from `indic-transliteration`
     # If unspecified, `DEFAULT_SCHEME` (`devanagari`) would be used.
+    # e.g. CDSL = pycdsl.CDSLCorpus(input_scheme="hk", output_scheme="iast")
 
-    CDSL = pycdsl.CDSLCorpus(input_scheme="itrans", output_scheme="iast")
+    # Search mode can be specified to search values by key or value or both.
+    # Valid options for `search_mode` are "key", "value", "both".
+    # These are also stored in convenience variables, and it is recommended
+    # to use these instead of string literals.
+    # The variables are, SEARCH_MODE_KEY, SEARCH_MODE_VALUE, SEARCH_MODE_BOTH.
+    # The variable SEARCH_MODES will always hold the list of all valid modes.
+    # The variable DEFAULT_SEARCH_MODE will alway point to the default mode.
+    # e.g. CDSL = pycdsl.CDSLCorpus(search_mode=pycdsl.SEARCH_MODE_VALUE)
 
 Setup default dictionaries (:code:`["MW", "MWE", "AP90", "AE"]`):
 
@@ -132,6 +141,9 @@ Search in a dictionary:
     # Show the next 10 results
     CDSL.MW.search("kṛ*", input_scheme="iast", limit=10, offset=10)
 
+    # Search using a different search mode
+    CDSL.MW.search("हृषीकेश", mode=pycdsl.SEARCH_MODE_VALUE)
+
 Access an entry by ID:
 
 .. code-block:: python
@@ -171,6 +183,13 @@ Change transliteration scheme for a dictionary:
 
     CDSL.MW.set_scheme(input_scheme="itrans")
     CDSL.MW.search("rAma")
+
+Change search mode for a dictionary:
+
+.. code-block:: python
+
+    CDSL.MW.set_search_mode(mode="value")
+    CDSL.MW.search("hRRiShIkesha")
 
 Classes :code:`CDSLCorpus` and :code:`CDSLDict` are iterable.
 
@@ -212,25 +231,35 @@ Help to the Console Interface:
 .. code-block:: console
 
     usage: cdsl [-h] [-i] [-s SEARCH] [-p PATH] [-d DICTS [DICTS ...]]
-                [-is INPUT_SCHEME] [-os OUTPUT_SCHEME] [-u] [-dbg] [-v]
+                [-sm SEARCH_MODE] [-is INPUT_SCHEME] [-os OUTPUT_SCHEME]
+                [-u] [-dbg] [-v]
 
     Access dictionaries from Cologne Digital Sanskrit Lexicon (CDSL)
 
     optional arguments:
-    -h, --help          show this help message and exit
-    -i, --interactive   Start in an interactive REPL mode
+    -h, --help            show this help message and exit
+    -i, --interactive     start in an interactive REPL mode
     -s SEARCH, --search SEARCH
-                        Search pattern. Ignored if `--interactive` mode is set.
-    -p PATH, --path PATH  Path to installation
+                          search pattern (ignored if `--interactive` mode is set)
+    -p PATH, --path PATH  path to installation
     -d DICTS [DICTS ...], --dicts DICTS [DICTS ...]
-                        Dictionary IDs
+                          dictionary id(s)
+    -sm SEARCH_MODE, --search-mode SEARCH_MODE
+                          search mode
     -is INPUT_SCHEME, --input-scheme INPUT_SCHEME
-                        Input transliteration scheme
+                          input transliteration scheme
     -os OUTPUT_SCHEME, --output-scheme OUTPUT_SCHEME
-                        Output transliteration scheme
-    -u, --update        Update the specified dictionaries.
-    -dbg, --debug       Turn debug mode on.
-    -v, --version       Show version and exit.
+                          output transliteration scheme
+    -u, --update          update specified dictionaries
+    -dbg, --debug         turn debug mode on
+    -v, --version         show version and exit
+
+
+Common Usage:
+
+.. code-block:: console
+
+    $ cdsl -d MW AP90 -s हृषीकेश
 
 
 **Note**: Arguments for specifying installation path, dictionary IDs, input and output transliteration schemes
@@ -261,9 +290,9 @@ REPL Session Example
 
     Documented commands (type help <topic>):
     ========================================
-    EOF        dicts  info          output_scheme  show    use
-    available  exit   input_scheme  search         stats   version
-    debug      help   limit         shell          update
+    EOF        dicts  info          output_scheme  shell  update
+    available  exit   input_scheme  search         show   use
+    debug      help   limit         search_mode    stats  version
 
     (CDSL::None) help available
     Display a list of dictionaries available in CDSL
@@ -313,7 +342,7 @@ REPL Session Example
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
     (CDSL::MW) input_scheme itrans
-    Input scheme: itrans
+    Input scheme set to 'itrans'.
 
     (CDSL::MW) hRRiSIkesha
 
@@ -327,9 +356,11 @@ REPL Session Example
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
     (CDSL::MW) output_scheme iast
-    Output scheme: iast
+    Output scheme set to 'iast'.
 
     (CDSL::MW) hRRiSIkesha
+
+    Found 6 results in MW.
 
     <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
     <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
@@ -339,7 +370,7 @@ REPL Session Example
     <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
 
     (CDSL::MW) limit 2
-    Limit: 2
+    Limit set to '2'.
 
     (CDSL::MW) hRRiSIkesha
 
@@ -347,6 +378,33 @@ REPL Session Example
 
     <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
     <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
+
+    (CDSL::MW) limit -1
+    Limit set to 'None'.
+
+    (CDSL::MW) search_mode value
+    Search mode set to 'value'.
+
+    (CDSL::MW) hRRiSIkesha
+
+    Found 1 results in MW.
+
+    <MWEntry: 263938.1: hṛṣīkeśatva = hṛṣīkeśa—tva n.>
+
+    (CDSL::MW) search_mode both
+    Search mode set to 'both'.
+
+    (CDSL::MW) hRRiSIkesha
+
+    Found 7 results in MW.
+
+    <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
+    <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
+    <MWEntry: 263935: hṛṣīkeśa = N. of the tenth month, VarBṛS.>
+    <MWEntry: 263936: hṛṣīkeśa = of a Tīrtha, Cat.>
+    <MWEntry: 263937: hṛṣīkeśa = of a poet, ib.>
+    <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
+    <MWEntry: 263938.1: hṛṣīkeśatva = hṛṣīkeśa—tva n.>
 
     (CDSL::MW) info
     Total 1 dictionaries are active.

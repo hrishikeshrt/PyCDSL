@@ -41,7 +41,7 @@ Features
 * Unified Programmable Interface to access all dictionaries available at CDSL
 * Console Command and REPL Interface for easy dictionary search
 * Extensive support for transliteration using :code:`indic-transliteration` module
-
+* Search by key, value or both
 
 .. toctree::
    :maxdepth: 2
