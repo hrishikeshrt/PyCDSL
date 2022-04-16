@@ -186,7 +186,7 @@ class CDSLShell(BasicShell):
                 print(f"Invalid mode. (valid modes are {self.search_modes})")
             else:
                 self.search_mode = mode
-                print(f"Search mode set to '{self.search_mode}'")
+                print(f"Search mode set to '{self.search_mode}'.")
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
@@ -320,10 +320,11 @@ class CDSLShell(BasicShell):
                 self.limit = int(text.strip())
                 if self.limit < 1:
                     self.limit = None
+                print(f"Limit set to '{self.limit}'.")
             except Exception:
                 self.logger.error("Limit must be an integer.")
-
-        print(f"Limit: {self.limit}")
+        else:
+            print(f"Limit: {self.limit}")
 
     # ----------------------------------------------------------------------- #
 
