@@ -29,12 +29,12 @@ LOGGER = logging.getLogger(__name__)
 
 class Lexicon(Model):
     """Lexicon Model"""
-    id = DecimalField(unique=True, decimal_places=2, column_name='lnum')
+    id = DecimalField(unique=True, decimal_places=2, column_name="lnum")
     key = CharField(index=True)
     data = TextField()
 
     def __str__(self) -> str:
-        return f'{self.id}: {self.key}'
+        return f"{self.id}: {self.key}"
 
     class Meta:
         database = DatabaseProxy()
@@ -105,8 +105,8 @@ class Entry:
                 end_pattern=r"</s>"
             )
 
-        self._soup = bs4.BeautifulSoup(self.data, 'xml')
-        self._body = self._soup.find('body')
+        self._soup = bs4.BeautifulSoup(self.data, "xml")
+        self._body = self._soup.find("body")
         self.__post_init__()
 
     def __post_init__(self):
@@ -144,6 +144,9 @@ class Entry:
             transliterate_keys=transliterate_keys
         )
 
+    # NOTE: The cache is only on the instance, while the search functions from
+    #       shell or cli re-create the Entry objects, so the cache doesn't
+    #       actually save much there.
     @lru_cache(maxsize=1)
     def meaning(self) -> str:
         """Extract meaning of the entry"""
@@ -164,7 +167,7 @@ class Entry:
 
     def __repr__(self) -> str:
         classname = self.__class__.__qualname__
-        return f'<{classname}: {self.id}: {self.key} = {self.meaning()}>'
+        return f"<{classname}: {self.id}: {self.key} = {self.meaning()}>"
 
 
 ###############################################################################
@@ -189,7 +192,7 @@ def lexicon_constructor(dict_id: str, table_name: str = None) -> Lexicon:
     """
     table_name = table_name or dict_id.lower()
     class_dict = {
-        "Meta": type("Meta", (), {'table_name': table_name})
+        "Meta": type("Meta", (), {"table_name": table_name})
     }
     bases = (Lexicon,)
     return type(f"{dict_id}Lexicon", bases, class_dict)
@@ -216,7 +219,7 @@ def entry_constructor(dict_id: str) -> Entry:
 
 class AP90Lexicon(Lexicon):
     class Meta:
-        table_name = 'ap90'
+        table_name = "ap90"
 
 
 class AP90Entry(Entry):
@@ -227,7 +230,7 @@ class AP90Entry(Entry):
 
 class MWLexicon(Lexicon):
     class Meta:
-        table_name = 'mw'
+        table_name = "mw"
 
 
 class MWEntry(Entry):
