@@ -13,8 +13,13 @@ from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 
 from .corpus import CDSLCorpus
-from .utils import validate_scheme
-from .constants import INTERNAL_SCHEME, DEFAULT_SCHEME
+from .utils import validate_scheme, validate_search_mode
+from .constants import (
+    INTERNAL_SCHEME,
+    DEFAULT_SCHEME,
+    SEARCH_MODES,
+    DEFAULT_SEARCH_MODE
+)
 from . import __version__
 
 ###############################################################################
@@ -54,6 +59,7 @@ class CDSLShell(BasicShell):
         self,
         data_dir: str = None,
         dict_ids: List[str] = None,
+        search_mode: str = None,
         input_scheme: str = None,
         output_scheme: str = None
     ):
@@ -70,6 +76,9 @@ class CDSLShell(BasicShell):
         dict_ids : list or None, optional
             List of dictionary IDs to setup.
             Passed to a CDSLCorpus.setup() as a keyword argument `dict_ids`.
+        search_mode : str or None, optional
+            Search mode to query by `key`, `value` or `both`.
+            The default is None.
         input_scheme : str or None, optional
             Transliteration scheme for input.
             If None, `DEFAULT_SCHEME` is used.
@@ -90,12 +99,17 @@ class CDSLShell(BasicShell):
             sanscript.SLP1,
             sanscript.WX,
         ]
+        self.search_modes = SEARCH_MODES
 
+        self.search_mode = (
+            validate_search_mode(search_mode) or DEFAULT_SEARCH_MODE
+        )
         self.input_scheme = validate_scheme(input_scheme) or DEFAULT_SCHEME
         self.output_scheme = validate_scheme(output_scheme) or DEFAULT_SCHEME
 
         self.cdsl = CDSLCorpus(
             data_dir=data_dir,
+            search_mode=None,
             input_scheme=None,
             output_scheme=None
         )
@@ -156,6 +170,23 @@ class CDSLShell(BasicShell):
             else:
                 self.output_scheme = scheme
                 print(f"Output scheme set to '{self.output_scheme}'.")
+
+    # ----------------------------------------------------------------------- #
+    # Search Mode
+
+    def complete_search_mode(self, text, line, begidx, endidx):
+        return [sch for sch in self.search_modes if sch.startswith(text)]
+
+    def do_search_mode(self, mode: str):
+        """Change the search mode"""
+        if not mode:
+            print(f"Search mode: {self.search_mode}")
+        else:
+            if mode not in self.search_modes:
+                print(f"Invalid mode. (valid modes are {self.search_modes})")
+            else:
+                self.search_mode = mode
+                print(f"Search mode set to '{self.search_mode}'")
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
@@ -320,7 +351,11 @@ class CDSLShell(BasicShell):
                 search_pattern = transliterate(
                     line, self.input_scheme, INTERNAL_SCHEME
                 ) if active_dict.transliterate_keys else line
-                results = active_dict.search(search_pattern, limit=self.limit)
+                results = active_dict.search(
+                    search_pattern,
+                    mode=self.search_mode,
+                    limit=self.limit
+                )
                 if not results:
                     continue
 
