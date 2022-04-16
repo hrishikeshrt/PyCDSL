@@ -291,6 +291,7 @@ class CDSLCorpus:
                 date=dict_date,
                 name=dict_name,
                 url=dict_download,
+                search_mode=self.search_mode,
                 input_scheme=self.input_scheme,
                 output_scheme=self.output_scheme,
                 transliterate_keys=dict_transliterate_keys
