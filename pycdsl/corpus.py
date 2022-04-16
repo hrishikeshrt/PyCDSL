@@ -21,6 +21,7 @@ from .models import (
 )
 from .lexicon import CDSLDict
 from .constants import (
+    DEFAULT_SEARCH_MODE,
     SERVER_URL,
     DEFAULT_CORPUS_DIR,
     DEFAULT_DICTIONARIES,
@@ -50,6 +51,7 @@ class CDSLCorpus:
     Refers to a CDSL installation instance at the location `data_dir`.
     """
     data_dir: str or Path = field(default=None)
+    search_mode: str = field(repr=False, default=DEFAULT_SEARCH_MODE)
     input_scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     output_scheme: str = field(repr=False, default=DEFAULT_SCHEME)
     transliterate_keys: bool = field(repr=False, default=True)
@@ -178,6 +180,7 @@ class CDSLCorpus:
         self,
         pattern: str,
         dict_ids: List[str] = None,
+        mode: str = None,
         input_scheme: str = None,
         output_scheme: str = None,
         ignore_case: bool = False,
@@ -196,6 +199,9 @@ class CDSLCorpus:
             Only the `dict_ids` that exist in `self.dicts` will be used.
             If None, all the dictionaries that have been setup,
             i.e., the dictionaries from `self.dicts` will be used.
+            The default is None.
+        mode : str or None, optional
+            Search mode to query by `key`, `value` or `both`.
             The default is None.
         input_scheme : str or None, optional
             Input transliteration scheme
@@ -240,6 +246,7 @@ class CDSLCorpus:
         for dict_id in dict_ids:
             dict_results = self.dicts[dict_id].search(
                 pattern=pattern,
+                mode=mode,
                 input_scheme=input_scheme,
                 output_scheme=output_scheme,
                 ignore_case=ignore_case,
