@@ -33,60 +33,60 @@ def main():
         "-i",
         "--interactive",
         action="store_true",
-        help="Start in an interactive REPL mode"
+        help="start in an interactive REPL mode"
     )
     parser.add_argument(
         "-s",
         "--search",
-        help="Search pattern. Ignored if `--interactive` mode is set."
+        help="search pattern (ignored if `--interactive` mode is set)"
     )
     parser.add_argument(
         "-p",
         "--path",
-        help="Path to installation"
+        help="path to installation"
     )
     parser.add_argument(
         "-d",
         "--dicts",
         nargs="+",
-        help="Dictionary IDs"
+        help="dictionary id(s)"
     )
     parser.add_argument(
         "-sm",
         "--search-mode",
         default=DEFAULT_SEARCH_MODE,
-        help="Search mode"
+        help="search mode"
     )
     parser.add_argument(
         "-is",
         "--input-scheme",
         default=DEFAULT_SCHEME,
-        help="Input transliteration scheme"
+        help="input transliteration scheme"
     )
     parser.add_argument(
         "-os",
         "--output-scheme",
         default=DEFAULT_SCHEME,
-        help="Output transliteration scheme"
+        help="output transliteration scheme"
     )
     parser.add_argument(
         "-u",
         "--update",
         action="store_true",
-        help="Update the specified dictionaries."
+        help="update specified dictionaries"
     )
     parser.add_argument(
         "-dbg",
         "--debug",
         action="store_true",
-        help="Turn debug mode on."
+        help="turn debug mode on"
     )
     parser.add_argument(
         "-v",
         "--version",
         action="version",
         version=f"%(prog)s {__version__}",
-        help="Show version and exit."
+        help="show version and exit"
     )
 
     args = vars(parser.parse_args())
