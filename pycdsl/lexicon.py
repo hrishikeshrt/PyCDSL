@@ -413,30 +413,29 @@ class CDSLDict:
         mode = validate_search_mode(mode) or self.search_mode
 
         pattern = transliterate(pattern, input_scheme, INTERNAL_SCHEME)
-        force_pattern = f"*{pattern.strip('*')}*"
+        value_pattern = f"*<body>*{pattern.strip('*')}*</body>*"
 
         if mode == SEARCH_MODE_KEY:
             query = self._lexicon.select().where(self._lexicon.key % pattern)
             iquery = self._lexicon.select().where(self._lexicon.key ** pattern)
         if mode == SEARCH_MODE_VALUE:
             query = self._lexicon.select().where(
-                self._lexicon.data % force_pattern
+                self._lexicon.data % value_pattern
             )
             iquery = self._lexicon.select().where(
-                self._lexicon.data ** force_pattern
+                self._lexicon.data ** value_pattern
             )
         if mode == SEARCH_MODE_BOTH:
             query = self._lexicon.select().where(
                 (self._lexicon.key % pattern) |
-                (self._lexicon.data % force_pattern)
+                (self._lexicon.data % value_pattern)
             )
             iquery = self._lexicon.select().where(
                 (self._lexicon.key ** pattern) |
-                (self._lexicon.data ** force_pattern)
+                (self._lexicon.data ** value_pattern)
             )
 
         search_query = iquery if ignore_case else query
-        LOGGER.debug(f"Query: {search_query}")
         return [
             self._entry(
                 result,
