@@ -1,8 +1,19 @@
 History
 =======
 
+0.8.0 (2022-04-17)
+------------------
+
+* Add search mode support to all interfaces (Issue `#24`_)
+* Uniformly follow lower case convention for CLI help mesages
+* Update documentation
+* Fix bugs
+
+.. _`#24`: https://github.com/hrishikeshrt/PyCDSL/issues/24
+
 0.7.0 (2022-03-17)
 ------------------
+
 * Add the explicit REPL command :code:`search`
 * Add a REPL command :code:`stats`
 * Interpret arguments :code:`all` and :code:`none` to the REPL command :code:`use`
