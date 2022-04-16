@@ -141,21 +141,21 @@ class CDSLShell(BasicShell):
             print(f"Input scheme: {self.input_scheme}")
         else:
             if scheme not in self.schemes:
-                print(f"Invalid scheme. (valid schemes are {self.schemes}")
+                print(f"Invalid scheme. (valid schemes are {self.schemes})")
             else:
                 self.input_scheme = scheme
-                print(f"Input scheme: {self.input_scheme}")
+                print(f"Input scheme set to '{self.input_scheme}'.")
 
     def do_output_scheme(self, scheme: str):
         """Change the output transliteration scheme"""
         if not scheme:
-            print(f"Input scheme: {self.output_scheme}")
+            print(f"Output scheme: {self.output_scheme}")
         else:
             if scheme not in self.schemes:
                 print(f"Invalid scheme. (valid schemes are {self.schemes}")
             else:
                 self.output_scheme = scheme
-                print(f"Output scheme: {self.output_scheme}")
+                print(f"Output scheme set to '{self.output_scheme}'.")
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
