@@ -8,12 +8,37 @@ import re
 import logging
 
 from indic_transliteration.sanscript import SCHEMES, transliterate
+from .constants import SEARCH_MODES
 
 ###############################################################################
 
 LOGGER = logging.getLogger(__name__)
 
 ###############################################################################
+
+
+def validate_search_mode(mode: str) -> str or None:
+    """Validate the search mode
+
+    Parameters
+    ----------
+    mode : str
+        Search mode
+
+    Returns
+    -------
+    str or None
+        If mode is valid, mode.lower()
+        otherwise, None.
+    """
+    if mode is not None:
+        _mode = mode.lower() if mode.lower() in SEARCH_MODES else None
+        if _mode is None:
+            LOGGER.warning(f"Invalid search mode '{mode}'.")
+    else:
+        _mode = None
+
+    return _mode
 
 
 def validate_scheme(scheme: str) -> str or None:

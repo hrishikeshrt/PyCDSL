@@ -20,14 +20,18 @@ import requests
 from requests_downloader.downloader import download
 from indic_transliteration.sanscript import transliterate
 
-from .utils import validate_scheme
+from .utils import validate_scheme, validate_search_mode
 from .models import (
     Lexicon, Entry,
     lexicon_constructor, entry_constructor
 )
 from .constants import (
     INTERNAL_SCHEME,
-    ENGLISH_DICTIONARIES
+    ENGLISH_DICTIONARIES,
+    DEFAULT_SEARCH_MODE,
+    SEARCH_MODE_KEY,
+    SEARCH_MODE_VALUE,
+    SEARCH_MODE_BOTH
 )
 
 ###############################################################################
@@ -45,6 +49,7 @@ class CDSLDict:
     name: str
     url: str = field(repr=False)
     db: str = field(repr=False, default=None)
+    search_mode: str = field(repr=False, default=None)
     input_scheme: str = field(repr=False, default=None)
     output_scheme: str = field(repr=False, default=None)
     transliterate_keys: bool = field(repr=False, default=None)
@@ -57,6 +62,7 @@ class CDSLDict:
             output_scheme=self.output_scheme,
             transliterate_keys=self.transliterate_keys
         )
+        self.set_search_mode(self.search_mode)
 
     # ----------------------------------------------------------------------- #
 
@@ -249,6 +255,18 @@ class CDSLDict:
         self.output_scheme = output_scheme
         self.transliterate_keys = transliterate_keys
 
+    def set_search_mode(self, mode: str):
+        """Set search mode
+
+        Parameters
+        ----------
+        mode : str
+            Valid values are 'key', 'value', 'both'
+            Recommended to use the convenience variables SEARCH_MODE_KEY,
+            SEARCH_MODE_VALUE or SEARCH_MODE_BOTH.
+        """
+        self.search_mode = validate_search_mode(mode) or DEFAULT_SEARCH_MODE
+
     # ----------------------------------------------------------------------- #
 
     def connect(
@@ -350,6 +368,7 @@ class CDSLDict:
     def search(
         self,
         pattern: str,
+        mode: str = None,
         input_scheme: str = None,
         output_scheme: str = None,
         ignore_case: str = False,
@@ -362,6 +381,10 @@ class CDSLDict:
         ----------
         pattern : str
             Search pattern, may contain wildcards (`*`).
+        mode : str or None, optional
+            Search mode to query by `key`, `value` or `both`.
+            If None, `self.search_mode` will be used.
+            The default is None.
         input_scheme : str or None, optional
             Input transliteration scheme
             If None, `self.input_scheme` will be used.
@@ -387,12 +410,33 @@ class CDSLDict:
         """
         input_scheme = validate_scheme(input_scheme) or self.input_scheme
         output_scheme = validate_scheme(output_scheme) or self.output_scheme
+        mode = validate_search_mode(mode) or self.search_mode
 
         pattern = transliterate(pattern, input_scheme, INTERNAL_SCHEME)
+        force_pattern = f"*{pattern.strip('*')}*"
 
-        query = self._lexicon.select().where(self._lexicon.key % pattern)
-        iquery = self._lexicon.select().where(self._lexicon.key ** pattern)
+        if mode == SEARCH_MODE_KEY:
+            query = self._lexicon.select().where(self._lexicon.key % pattern)
+            iquery = self._lexicon.select().where(self._lexicon.key ** pattern)
+        if mode == SEARCH_MODE_VALUE:
+            query = self._lexicon.select().where(
+                self._lexicon.data % force_pattern
+            )
+            iquery = self._lexicon.select().where(
+                self._lexicon.data ** force_pattern
+            )
+        if mode == SEARCH_MODE_BOTH:
+            query = self._lexicon.select().where(
+                (self._lexicon.key % pattern) |
+                (self._lexicon.data % force_pattern)
+            )
+            iquery = self._lexicon.select().where(
+                (self._lexicon.key ** pattern) |
+                (self._lexicon.data ** force_pattern)
+            )
+
         search_query = iquery if ignore_case else query
+        LOGGER.debug(f"Query: {search_query}")
         return [
             self._entry(
                 result,
