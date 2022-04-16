@@ -10,7 +10,7 @@ import argparse
 
 from .corpus import CDSLCorpus
 from .shell import CDSLShell
-from .constants import DEFAULT_SCHEME
+from .constants import DEFAULT_SCHEME, DEFAULT_SEARCH_MODE
 from . import __version__
 
 ###############################################################################
@@ -52,6 +52,12 @@ def main():
         help="Dictionary IDs"
     )
     parser.add_argument(
+        "-sm",
+        "--search-mode",
+        default=DEFAULT_SEARCH_MODE,
+        help="Search mode"
+    )
+    parser.add_argument(
         "-is",
         "--input-scheme",
         default=DEFAULT_SCHEME,
@@ -88,6 +94,7 @@ def main():
     # arguments
     data_dir = args.get("path")
     dict_ids = args.get("dicts")
+    search_mode = args.get("search_mode")
     input_scheme = args.get("input_scheme")
     output_scheme = args.get("output_scheme")
 
@@ -106,6 +113,7 @@ def main():
         cdsl_shell = CDSLShell(
             data_dir=data_dir,
             dict_ids=dict_ids,
+            search_mode=search_mode,
             input_scheme=input_scheme,
             output_scheme=output_scheme
         )
@@ -115,6 +123,7 @@ def main():
         # non-interactive shell command
         cdsl = CDSLCorpus(
             data_dir=data_dir,
+            search_mode=search_mode,
             input_scheme=input_scheme,
             output_scheme=output_scheme
         )
