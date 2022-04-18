@@ -4,7 +4,7 @@
 
 ###############################################################################
 
-import logging
+# import logging
 from typing import List
 
 import cmd2
@@ -142,25 +142,25 @@ class CDSLShell(BasicShell):
         self.dict_ids = dict_ids
         self.active_dicts = None
 
-        # Logging
-        self.logger = logging.getLogger()  # root logger
-        if not self.logger.hasHandlers():
-            self.logger.addHandler(logging.StreamHandler())
-        self.logger.setLevel(logging.INFO)
+        # # Logging
+        # self.logger = logging.getLogger()  # root logger
+        # if not self.logger.hasHandlers():
+        #     self.logger.addHandler(logging.StreamHandler())
+        # self.logger.setLevel(logging.INFO)
 
     # ----------------------------------------------------------------------- #
     # Debug Mode
 
-    def do_debug(self, arg: str):
-        """Turn debug mode on/off"""
-        arg = arg.lower()
-        if arg in ["true", "on", "yes"]:
-            self.debug = True
-            self.logger.setLevel(logging.DEBUG)
-        if arg in ["false", "off", "no"]:
-            self.debug = False
-            self.logger.setLevel(logging.INFO)
-        print(f"Debug: {self.debug}")
+    # def do_debug(self, arg: str):
+    #     """Turn debug mode on/off"""
+    #     arg = arg.lower()
+    #     if arg in ["true", "on", "yes"]:
+    #         self.debug = True
+    #         self.logger.setLevel(logging.DEBUG)
+    #     if arg in ["false", "off", "no"]:
+    #         self.debug = False
+    #         self.logger.setLevel(logging.INFO)
+    #     print(f"Debug: {self.debug}")
 
     # ----------------------------------------------------------------------- #
     # Input/Output Transliteration Scheme
@@ -345,7 +345,7 @@ class CDSLShell(BasicShell):
                             transliterate_keys=active_dict.transliterate_keys
                         )
                     )
-                    self.logger.debug(f"Data: {result.data}")
+                    # self.logger.debug(f"Data: {result.data}")
                 except Exception:
                     result = None
 
