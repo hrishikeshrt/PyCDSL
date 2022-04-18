@@ -17,6 +17,8 @@ requirements = [
     'lxml>=4.6.2',
     'peewee>=3.14.4',
     'indic_transliteration>=2.2.4',
+    'cmd2>=2.4.1',
+    "pyreadline3; platform_system == 'Windows'",
 ]
 
 test_requirements = ['pytest>=3', ]
