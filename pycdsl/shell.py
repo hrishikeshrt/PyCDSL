@@ -104,6 +104,7 @@ class CDSLShell(BasicShell):
         )
         self.default_category = "Utility"
         remove_settables = [
+            "allow_style",
             "always_show_hint",
             "echo",
             "editor",
@@ -132,7 +133,7 @@ class CDSLShell(BasicShell):
         self.add_settable(
             cmd2.utils.Settable(
                 "search_mode",
-                str,
+                str.lower,
                 "Search mode",
                 self,
                 choices=self.search_modes
@@ -141,7 +142,7 @@ class CDSLShell(BasicShell):
         self.add_settable(
             cmd2.utils.Settable(
                 "input_scheme",
-                str,
+                str.lower,
                 "Input transliteration scheme",
                 self,
                 choices=self.schemes
@@ -150,7 +151,7 @@ class CDSLShell(BasicShell):
         self.add_settable(
             cmd2.utils.Settable(
                 "output_scheme",
-                str,
+                str.lower,
                 "Output transliteration scheme",
                 self,
                 choices=self.schemes
@@ -159,10 +160,9 @@ class CDSLShell(BasicShell):
         self.add_settable(
             cmd2.utils.Settable(
                 "limit",
-                int,
+                lambda x: int(x) if int(x) > 0 else None,
                 "Limit search results",
-                self,
-                onchange_cb=self._limit_handler
+                self
             )
         )
 
@@ -177,12 +177,6 @@ class CDSLShell(BasicShell):
         )
         self.dict_ids = dict_ids
         self.active_dicts = None
-
-    # ----------------------------------------------------------------------- #
-
-    def _limit_handler(self, name, old_value, new_value):
-        if new_value < 0:
-            self.limit = None
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
