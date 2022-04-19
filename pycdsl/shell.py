@@ -305,12 +305,21 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
+    show_parser = cmd2.Cmd2ArgumentParser()
+    show_parser.add_argument("entry_id", type=int, help="entry ID to show")
+    show_parser.add_argument(
+        "--show-data", action="store_true", help="show XML data field"
+    )
+
     @cmd2.with_category("Core")
-    def do_show(self, entry_id: cmd2.Statement):
+    @cmd2.with_argparser(show_parser)
+    def do_show(self, namespace: cmd2.argparse.Namespace):
         """Show a specific entry by ID"""
         if self.active_dicts is None:
             self.perror("Please select a dictionary first.")
         else:
+            entry_id = namespace.entry_id
+            show_data = namespace.show_data
             for active_dict in self.active_dicts:
                 try:
                     result = active_dict.entry(entry_id)
@@ -320,7 +329,8 @@ class CDSLShell(BasicShell):
                             transliterate_keys=active_dict.transliterate_keys
                         )
                     )
-                    # self.logger.debug(f"Data: {result.data}")
+                    if show_data:
+                        self.poutput(f"\nData:\n{result.data}")
                 except Exception:
                     result = None
 
