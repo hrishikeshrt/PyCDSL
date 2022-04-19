@@ -103,7 +103,7 @@ class CDSLShell(BasicShell):
             startup_script=startup_script,
             allow_cli_args=False
         )
-        self.default_category = "Utility Commands"
+        self.default_category = "Utility"
         remove_settables = [
             "always_show_hint",
             "echo",
@@ -208,7 +208,7 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
     # Dictionary Information
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_info(self, _: cmd2.Statement):
         """Display information about active dictionaries"""
         if self.active_dicts is None:
@@ -220,7 +220,7 @@ class CDSLShell(BasicShell):
             for active_dict in self.active_dicts:
                 self.poutput(active_dict)
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_stats(self, _: cmd2.Statement):
         """Display statistics about active dictionaries"""
         if self.active_dicts is None:
@@ -238,13 +238,13 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_dicts(self, _: cmd2.Statement):
         """Display a list of dictionaries available locally"""
         for _, cdsl_dict in self.cdsl.dicts.items():
             self.poutput(cdsl_dict)
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_available(self, _: cmd2.Statement):
         """Display a list of dictionaries available in CDSL"""
         for _, cdsl_dict in self.cdsl.available_dicts.items():
@@ -252,7 +252,7 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_update(self, _: cmd2.Statement):
         """Update loaded dictionaries"""
         self.cdsl.setup(list(self.cdsl.dicts), update=True)
@@ -266,7 +266,7 @@ class CDSLShell(BasicShell):
             if dict_id.startswith(text.upper())
         ]
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_use(self, line: cmd2.Statement):
         """
         Load the specified dictionaries from CDSL.
@@ -316,7 +316,7 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_show(self, entry_id: cmd2.Statement):
         """Show a specific entry by ID"""
         if self.active_dicts is None:
@@ -343,8 +343,7 @@ class CDSLShell(BasicShell):
     # ----------------------------------------------------------------------- #
 
 
-
-    @cmd2.with_category("CDSL Core Commands")
+    @cmd2.with_category("Core")
     def do_search(self, line: cmd2.Statement):
         """
         Search in the active dictionaries
