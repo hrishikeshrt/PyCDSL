@@ -10,7 +10,12 @@ import argparse
 
 from .corpus import CDSLCorpus
 from .shell import CDSLShell
-from .constants import DEFAULT_SCHEME, DEFAULT_SEARCH_MODE
+from .constants import (
+    DEFAULT_SCHEME,
+    DEFAULT_SEARCH_MODE,
+    DEFAULT_HISTORY_FILE,
+    DEFAULT_STARTUP_SCRIPT
+)
 from . import __version__
 
 ###############################################################################
@@ -70,6 +75,18 @@ def main():
         help="output transliteration scheme"
     )
     parser.add_argument(
+        "-hf",
+        "--history-file",
+        default=DEFAULT_HISTORY_FILE,
+        help="path to the history file"
+    )
+    parser.add_argument(
+        "-sc",
+        "--startup-script",
+        default=DEFAULT_STARTUP_SCRIPT,
+        help="path to the startup script"
+    )
+    parser.add_argument(
         "-u",
         "--update",
         action="store_true",
@@ -98,6 +115,9 @@ def main():
     input_scheme = args.get("input_scheme")
     output_scheme = args.get("output_scheme")
 
+    history_file = args.get("history_file")
+    startup_script = args.get("startup_script")
+
     flag_update = args.get("update")
     flag_debug = args.get("debug")
     flag_interactive = args.get("interactive")
@@ -115,10 +135,12 @@ def main():
             dict_ids=dict_ids,
             search_mode=search_mode,
             input_scheme=input_scheme,
-            output_scheme=output_scheme
+            output_scheme=output_scheme,
+            history_file=history_file,
+            startup_script=startup_script
         )
         cdsl_shell.cdsl.setup(dict_ids=dict_ids, update=flag_update)
-        cdsl_shell.cmdloop()
+        return cdsl_shell.cmdloop()
     else:
         # non-interactive shell command
         cdsl = CDSLCorpus(

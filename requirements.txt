@@ -4,3 +4,4 @@ beautifulsoup4>=4.10.0
 lxml>=4.6.2
 indic_transliteration>=2.2.4
 peewee>=3.14.4
+cmd2>=2.4.1

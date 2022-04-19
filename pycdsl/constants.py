@@ -55,4 +55,7 @@ ENGLISH_DICTIONARIES = ["MWE", "BOR", "AE"]
 HOME_DIR = Path.home()
 DEFAULT_CORPUS_DIR = HOME_DIR / "cdsl_data"
 
+DEFAULT_HISTORY_FILE = HOME_DIR / ".cdsl_history"
+DEFAULT_STARTUP_SCRIPT = HOME_DIR / ".cdslrc"
+
 ###############################################################################
