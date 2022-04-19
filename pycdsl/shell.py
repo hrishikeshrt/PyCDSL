@@ -130,6 +130,43 @@ class CDSLShell(BasicShell):
         self.limit = 50
         self.offset = None
 
+        self.add_settable(
+            cmd2.utils.Settable(
+                "search_mode",
+                str,
+                "Search mode",
+                self,
+                choices=self.search_modes
+            )
+        )
+        self.add_settable(
+            cmd2.utils.Settable(
+                "input_scheme",
+                str,
+                "Input transliteration scheme",
+                self,
+                choices=self.schemes
+            )
+        )
+        self.add_settable(
+            cmd2.utils.Settable(
+                "output_scheme",
+                str,
+                "Output transliteration scheme",
+                self,
+                choices=self.schemes
+            )
+        )
+        self.add_settable(
+            cmd2.utils.Settable(
+                "limit",
+                int,
+                "Limit search results",
+                self,
+                onchange_cb=self._limit_handler
+            )
+        )
+
         # ------------------------------------------------------------------- #
 
         # Corpus Initialisation
@@ -163,61 +200,10 @@ class CDSLShell(BasicShell):
     #     print(f"Debug: {self.debug}")
 
     # ----------------------------------------------------------------------- #
-    # Input/Output Transliteration Scheme
 
-    def complete_input_scheme(self, text, line, begidx, endidx):
-        return [sch for sch in self.schemes if sch.startswith(text)]
-
-    def complete_output_scheme(self, text, line, begidx, endidx):
-        return [sch for sch in self.schemes if sch.startswith(text)]
-
-    @cmd2.with_category("CDSL Settings")
-    def do_input_scheme(self, scheme: cmd2.Statement):
-        """Change the input transliteration scheme"""
-        if not scheme:
-            self.poutput(f"Input scheme: {self.input_scheme}")
-        else:
-            if scheme not in self.schemes:
-                self.pwarning(
-                    f"Invalid scheme. (valid schemes are {self.schemes})"
-                )
-            else:
-                self.input_scheme = scheme
-                self.poutput(f"Input scheme set to '{self.input_scheme}'.")
-
-    @cmd2.with_category("CDSL Settings")
-    def do_output_scheme(self, scheme: cmd2.Statement):
-        """Change the output transliteration scheme"""
-        if not scheme:
-            self.poutput(f"Output scheme: {self.output_scheme}")
-        else:
-            if scheme not in self.schemes:
-                self.pwarning(
-                    f"Invalid scheme. (valid schemes are {self.schemes}"
-                )
-            else:
-                self.output_scheme = scheme
-                self.poutput(f"Output scheme set to '{self.output_scheme}'.")
-
-    # ----------------------------------------------------------------------- #
-    # Search Mode
-
-    def complete_search_mode(self, text, line, begidx, endidx):
-        return [sch for sch in self.search_modes if sch.startswith(text)]
-
-    @cmd2.with_category("CDSL Settings")
-    def do_search_mode(self, mode: cmd2.Statement):
-        """Change the search mode"""
-        if not mode:
-            self.poutput(f"Search mode: {self.search_mode}")
-        else:
-            if validate_search_mode(mode) is None:
-                self.pwarning(
-                    f"Invalid mode. (valid modes are {self.search_modes})"
-                )
-            else:
-                self.search_mode = validate_search_mode(mode)
-                self.poutput(f"Search mode set to '{self.search_mode}'.")
+    def _limit_handler(self, name, old_value, new_value):
+        if new_value < 0:
+            self.limit = None
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
@@ -356,27 +342,7 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    @cmd2.with_category("CDSL Settings")
-    def do_limit(self, text: cmd2.Statement):
-        """Limit the number of search results per dictionary"""
-        if text:
-            try:
-                self.limit = int(text.strip())
-                if self.limit < 1:
-                    self.limit = None
-                self.poutput(f"Limit set to {self.limit}.")
-            except Exception:
-                self.pwarning("Limit must be an integer.")
-        else:
-            self.poutput(f"Limit: {self.limit}")
 
-    # ----------------------------------------------------------------------- #
-
-    def do_version(self, _: cmd2.Statement):
-        """Show the current version of PyCDSL"""
-        self.poutput(f"PyCDSL v{__version__}")
-
-    # ----------------------------------------------------------------------- #
 
     @cmd2.with_category("CDSL Core Commands")
     def do_search(self, line: cmd2.Statement):
@@ -440,5 +406,10 @@ class CDSLShell(BasicShell):
             except KeyboardInterrupt:
                 self.poutput("\nKeyboardInterrupt")
 
+    # ----------------------------------------------------------------------- #
+
+    def do_version(self, _: cmd2.Statement):
+        """Show the current version of PyCDSL"""
+        self.poutput(f"PyCDSL v{__version__}")
 
 ###############################################################################
