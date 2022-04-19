@@ -21,7 +21,7 @@ requirements = [
     "pyreadline3; platform_system == 'Windows'",
 ]
 
-test_requirements = ['pytest>=3', ]
+test_requirements = ['pytest>=3', 'cmd2_ext_test>=2.0.0']
 
 setup(
     author="Hrishikesh Terdalkar",
