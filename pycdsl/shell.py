@@ -4,7 +4,6 @@
 
 ###############################################################################
 
-# import logging
 from typing import List
 
 import cmd2
@@ -179,26 +178,6 @@ class CDSLShell(BasicShell):
         self.dict_ids = dict_ids
         self.active_dicts = None
 
-        # # Logging
-        # self.logger = logging.getLogger()  # root logger
-        # if not self.logger.hasHandlers():
-        #     self.logger.addHandler(logging.StreamHandler())
-        # self.logger.setLevel(logging.INFO)
-
-    # ----------------------------------------------------------------------- #
-    # Debug Mode
-
-    # def do_debug(self, arg: str):
-    #     """Turn debug mode on/off"""
-    #     arg = arg.lower()
-    #     if arg in ["true", "on", "yes"]:
-    #         self.debug = True
-    #         self.logger.setLevel(logging.DEBUG)
-    #     if arg in ["false", "off", "no"]:
-    #         self.debug = False
-    #         self.logger.setLevel(logging.INFO)
-    #     print(f"Debug: {self.debug}")
-
     # ----------------------------------------------------------------------- #
 
     def _limit_handler(self, name, old_value, new_value):
@@ -259,36 +238,48 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
-    def complete_use(self, text, line, begidx, endidx):
+    def _use_completer(self, text, line, begidx, endidx):
         return [
             dict_id
             for dict_id in self.cdsl.available_dicts
             if dict_id.startswith(text.upper())
         ]
+    use_parser = cmd2.Cmd2ArgumentParser()
+    use_parser.add_argument(
+        "dict_ids",
+        nargs="*",
+        type=str.upper,
+        help="Dictionary IDs",
+        completer=_use_completer
+    )
+    use_parser.add_argument(
+        "-a", "--all", action="store_true", help="Load all"
+    )
+    use_parser.add_argument(
+        "-n", "--none", action="store_true", help="Unload all"
+    )
 
     @cmd2.with_category("Core")
-    def do_use(self, line: cmd2.Statement):
+    @cmd2.with_argparser(use_parser)
+    def do_use(self, namespace: cmd2.argparse.Namespace):
         """
         Load the specified dictionaries from CDSL.
         If not available locally, they will be installed first.
-
-        * `all` to load all
-        * `none` to unload all
         """
-        line = line.upper().strip()
-        if not line:
-            self.perror("Please provide dictionary ID(s) to use.")
-            return
-        if line == "NONE":
-            self.active_dicts = []
-        elif line == "ALL":
+        if namespace.all:
             status = self.cdsl.setup()
             if status:
                 self.active_dicts = self.cdsl.dicts.values()
             else:
-                self.perror("Couldn't setup some dictionary.")
+                self.perror("Couldn't setup some dictionaries.")
+        elif namespace.none:
+            self.active_dicts = []
         else:
-            dict_ids = line.split()
+            dict_ids = namespace.dict_ids
+            if not dict_ids:
+                self.perror("Please provide dictionary ID(s) to use.")
+                return
+
             self.active_dicts = []
             for dict_id in dict_ids:
                 status = (
@@ -297,9 +288,7 @@ class CDSLShell(BasicShell):
                 if status:
                     self.active_dicts.append(self.cdsl.dicts[dict_id])
                 else:
-                    self.perror(
-                        f"Couldn't setup dictionary '{dict_id}'."
-                    )
+                    self.perror(f"Couldn't setup dictionary '{dict_id}'.")
 
         active_count = len(self.active_dicts)
         active_ids = [active_dict.id for active_dict in self.active_dicts]
@@ -349,7 +338,7 @@ class CDSLShell(BasicShell):
 
     @cmd2.with_category("Core")
     @cmd2.with_argparser(search_parser)
-    def do_search(self, statement: cmd2.argparse.Namespace):
+    def do_search(self, namespace: cmd2.argparse.Namespace):
         """
         Search in the active dictionaries
 
@@ -363,9 +352,9 @@ class CDSLShell(BasicShell):
         if self.active_dicts is None:
             self.perror("Please select a dictionary first.")
         else:
-            pattern = statement.pattern
-            offset = statement.offset
-            limit = statement.limit or self.limit
+            pattern = namespace.pattern
+            offset = namespace.offset
+            limit = namespace.limit or self.limit
 
             for active_dict in self.active_dicts:
                 search_pattern = transliterate(
