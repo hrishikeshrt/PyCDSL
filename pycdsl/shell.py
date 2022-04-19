@@ -342,9 +342,14 @@ class CDSLShell(BasicShell):
 
     # ----------------------------------------------------------------------- #
 
+    search_parser = cmd2.Cmd2ArgumentParser()
+    search_parser.add_argument("pattern", type=str, help="search pattern")
+    search_parser.add_argument("--limit", type=int, help="limit results")
+    search_parser.add_argument("--offset", type=int, help="skip results")
 
     @cmd2.with_category("Core")
-    def do_search(self, line: cmd2.Statement):
+    @cmd2.with_argparser(search_parser)
+    def do_search(self, statement: cmd2.argparse.Namespace):
         """
         Search in the active dictionaries
 
@@ -358,14 +363,19 @@ class CDSLShell(BasicShell):
         if self.active_dicts is None:
             self.perror("Please select a dictionary first.")
         else:
+            pattern = statement.pattern
+            offset = statement.offset
+            limit = statement.limit or self.limit
+
             for active_dict in self.active_dicts:
                 search_pattern = transliterate(
-                    line, self.input_scheme, INTERNAL_SCHEME
-                ) if active_dict.transliterate_keys else line
+                    pattern, self.input_scheme, INTERNAL_SCHEME
+                ) if active_dict.transliterate_keys else pattern
                 results = active_dict.search(
                     search_pattern,
                     mode=self.search_mode,
-                    limit=self.limit
+                    limit=limit,
+                    offset=offset
                 )
                 if not results:
                     continue
