@@ -97,7 +97,7 @@ class CDSLShell(BasicShell):
             If None, no startup commands are run.
             The default is None.
         """
-        super(self.__class__, self).__init__(
+        super().__init__(
             persistent_history_file=history_file,
             startup_script=startup_script,
             allow_cli_args=False
