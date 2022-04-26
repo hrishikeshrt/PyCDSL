@@ -1,6 +1,20 @@
 History
 =======
 
+0.9.0 (2022-04-27)
+------------------
+
+* Upgrade REPL Interface by migrating from :code:`cmd` to :code:`cmd2`. (Issue `#26`_)
+* Persistent history, start-up script support, shortcuts, aliases, macros
+* Output redirection
+* Clipboard integration
+* Update documentation
+* Fix bugs (Issue `#25`_)
+
+.. _`#25`: https://github.com/hrishikeshrt/PyCDSL/issues/25
+.. _`#26`: https://github.com/hrishikeshrt/PyCDSL/issues/26
+
+
 0.8.0 (2022-04-17)
 ------------------
 
