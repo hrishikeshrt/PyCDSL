@@ -106,10 +106,14 @@ class CDSLShell(BasicShell):
             If None, no startup commands are run.
             The default is None.
         """
+        shortcuts = dict(cmd2.DEFAULT_SHORTCUTS)
+        shortcuts.update({'/': 'search', '$': 'show'})
+
         super().__init__(
             persistent_history_file=history_file,
             startup_script=startup_script,
-            allow_cli_args=False
+            allow_cli_args=False,
+            shortcuts=shortcuts
         )
         self.default_category = "Utility"
         remove_settables = [
