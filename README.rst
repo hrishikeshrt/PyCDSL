@@ -40,7 +40,11 @@ Features
 
 * CDSL Corpus Management (Download, Update, Access)
 * Unified Programmable Interface to access all dictionaries available at CDSL
-* Console Command and REPL Interface for easy dictionary search
+* Command Line Interfaces for quick and easy search
+
+  * Console Command: :code:`cdsl`
+  * REPL Interface (*powered by* :code:`cmd2`)
+
 * Extensive support for transliteration using :code:`indic-transliteration` module
 * Search by key, value or both
 
@@ -232,27 +236,32 @@ Help to the Console Interface:
 
     usage: cdsl [-h] [-i] [-s SEARCH] [-p PATH] [-d DICTS [DICTS ...]]
                 [-sm SEARCH_MODE] [-is INPUT_SCHEME] [-os OUTPUT_SCHEME]
+                [-hf HISTORY_FILE] [-sc STARTUP_SCRIPT]
                 [-u] [-dbg] [-v]
 
     Access dictionaries from Cologne Digital Sanskrit Lexicon (CDSL)
 
     optional arguments:
-    -h, --help            show this help message and exit
-    -i, --interactive     start in an interactive REPL mode
-    -s SEARCH, --search SEARCH
-                          search pattern (ignored if `--interactive` mode is set)
-    -p PATH, --path PATH  path to installation
-    -d DICTS [DICTS ...], --dicts DICTS [DICTS ...]
-                          dictionary id(s)
-    -sm SEARCH_MODE, --search-mode SEARCH_MODE
-                          search mode
-    -is INPUT_SCHEME, --input-scheme INPUT_SCHEME
-                          input transliteration scheme
-    -os OUTPUT_SCHEME, --output-scheme OUTPUT_SCHEME
-                          output transliteration scheme
-    -u, --update          update specified dictionaries
-    -dbg, --debug         turn debug mode on
-    -v, --version         show version and exit
+      -h, --help            show this help message and exit
+      -i, --interactive     start in an interactive REPL mode
+      -s SEARCH, --search SEARCH
+                            search pattern (ignored if `--interactive` mode is set)
+      -p PATH, --path PATH  path to installation
+      -d DICTS [DICTS ...], --dicts DICTS [DICTS ...]
+                            dictionary id(s)
+      -sm SEARCH_MODE, --search-mode SEARCH_MODE
+                            search mode
+      -is INPUT_SCHEME, --input-scheme INPUT_SCHEME
+                            input transliteration scheme
+      -os OUTPUT_SCHEME, --output-scheme OUTPUT_SCHEME
+                            output transliteration scheme
+      -hf HISTORY_FILE, --history-file HISTORY_FILE
+                            path to the history file
+      -sc STARTUP_SCRIPT, --startup-script STARTUP_SCRIPT
+                            path to the startup script
+      -u, --update          update specified dictionaries
+      -dbg, --debug         turn debug mode on
+      -v, --version         show version and exit
 
 
 Common Usage:
@@ -268,12 +277,33 @@ are valid for both interactive REPL shell and non-interactive console command.
 Using REPL Interface of PyCDSL
 ------------------------------
 
+REPL Interface is powered by :code:`cmd2`, and thus supports persistent history,
+start-up script, and several other rich features.
+
 To use REPL Interface to Cologne Digital Sanskrit Lexicon (CDSL):
 
 .. code-block:: console
 
     $ cdsl -i
 
+
+cmd2 Inherited REPL Features
+----------------------------
+
+* **Persistent History** across sessions is maintained at :code:`~/.cdsl_history`.
+* If **Start-up Script** is present (:code:`~/.cdslrc`), the commands (one per line) are run at the start-up.
+* Customized **shortcuts** for several useful commands, such as :code:`!` for :code:`shell`, :code:`/` for :code:`search` and :code:`$` for :code:`show`.
+* **Aliases** can be created on runtime.
+* **Output Redirection** works like the standard console, e.g. :code:`command args > output.txt` will write the output of :code:`command` to :code:`output.txt`. Similarly, :code:`>>` can be used to append the output.
+* **Clipboard Integration** is supported through :code:`Pyperclip`. If the output file name is omitted, the output is copied to the clipboard, e.g., :code:`command args >`. The output can even be appended to clipboard by :code:`command args >>`.
+
+**References**
+
+* :code:`cmd2`: https://cmd2.readthedocs.io/en/latest/index.html
+* :code:`pyperclip`: https://pypi.org/project/pyperclip/
+
+
+**Note**: The locations of history file and start-up script can be customized through CLI options.
 
 REPL Session Example
 --------------------
@@ -286,18 +316,41 @@ REPL Session Example
     Type any keyword to search in the selected dictionaries. (help or ? for list of options)
     Loaded 4 dictionaries.
 
-    (CDSL::None) help
+    (CDSL::None) help -v
 
-    Documented commands (type help <topic>):
-    ========================================
-    EOF        dicts  info          output_scheme  shell  update
-    available  exit   input_scheme  search         show   use
-    debug      help   limit         search_mode    stats  version
+    Documented commands (use 'help -v' for verbose/'help <topic>' for details):
+
+    Core
+    ======================================================================================================
+    available             Display a list of dictionaries available in CDSL
+    dicts                 Display a list of dictionaries available locally
+    info                  Display information about active dictionaries
+    search                Search in the active dictionaries
+    show                  Show a specific entry by ID
+    stats                 Display statistics about active dictionaries
+    update                Update loaded dictionaries
+    use                   Load the specified dictionaries from CDSL.
+                          If not available locally, they will be installed first.
+
+    Utility
+    ======================================================================================================
+    alias                 Manage aliases
+    help                  List available commands or provide detailed help for a specific command
+    history               View, run, edit, save, or clear previously entered commands
+    macro                 Manage macros
+    quit                  Exit this application
+    run_script            Run commands in script file that is encoded as either ASCII or UTF-8 text
+    set                   Set a settable parameter or show current settings of parameters
+    shell                 Execute a command as if at the OS prompt
+    shortcuts             List available shortcuts
+    version               Show the current version of PyCDSL
 
     (CDSL::None) help available
     Display a list of dictionaries available in CDSL
 
     (CDSL::None) help search
+
+    Usage: search [-h] [--limit LIMIT] [--offset OFFSET] pattern
 
         Search in the active dictionaries
 
@@ -307,6 +360,15 @@ REPL Session Example
         * In general, we do not need to use this command explicitly unless we
           want to search the command keywords, such as, `available` `search`,
           `version`, `help` etc. in the active dictionaries.
+
+
+    positional arguments:
+    pattern          search pattern
+
+    optional arguments:
+      -h, --help       show this help message and exit
+      --limit LIMIT    limit results
+      --offset OFFSET  skip results
 
     (CDSL::None) help dicts
     Display a list of dictionaries available locally
@@ -341,8 +403,27 @@ REPL Session Example
 
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
-    (CDSL::MW) input_scheme itrans
-    Input scheme set to 'itrans'.
+    (CDSL::MW) show 263938 --show-data
+
+    <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
+
+    Data:
+    <H3A><h><key1>hfzIkeSa<\/key1><key2>hfzIkeSa<\/key2><\/h>
+    <body>  lord of the senses (said of <s1 slp1="manas">Manas<\/s1>), <ls>BhP.<\/ls><info lex="inh"\/><\/body>
+    <tail><L>263938<\/L><pc>1303,2<\/pc><\/tail><\/H3A>
+
+    (CDSL::MW) $263938
+
+    <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
+
+    (CDSL::MW) $263938 > output.txt
+    (CDSL::MW) !cat output.txt
+
+    <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
+
+    (CDSL::MW) set input_scheme itrans
+    input_scheme - was: 'devanagari'
+    now: 'itrans'
 
     (CDSL::MW) hRRiSIkesha
 
@@ -355,8 +436,9 @@ REPL Session Example
     <MWEntry: 263937: हृषीकेश = of a poet, ib.>
     <MWEntry: 263938: हृषीकेश = lord of the senses (said of Manas), BhP.>
 
-    (CDSL::MW) output_scheme iast
-    Output scheme set to 'iast'.
+    (CDSL::MW) set output_scheme iast
+    output_scheme - was: 'devanagari'
+    now: 'iast'
 
     (CDSL::MW) hRRiSIkesha
 
@@ -369,8 +451,9 @@ REPL Session Example
     <MWEntry: 263937: hṛṣīkeśa = of a poet, ib.>
     <MWEntry: 263938: hṛṣīkeśa = lord of the senses (said of Manas), BhP.>
 
-    (CDSL::MW) limit 2
-    Limit set to '2'.
+    (CDSL::MW) set limit 2
+    limit - was: 50
+    now: 2
 
     (CDSL::MW) hRRiSIkesha
 
@@ -379,11 +462,13 @@ REPL Session Example
     <MWEntry: 263922: hṛṣīkeśa = hṛṣī-keśa a   See below under hṛṣīka.>
     <MWEntry: 263934: hṛṣīkeśa = hṛṣīkeśa b m. (perhaps = hṛṣī-keśa cf. hṛṣī-vat above) id. (-tva n.), MBh.; Hariv. &c.>
 
-    (CDSL::MW) limit -1
-    Limit set to 'None'.
+    (CDSL::MW) set limit -1
+    limit - was: 2
+    now: None
 
-    (CDSL::MW) search_mode value
-    Search mode set to 'value'.
+    (CDSL::MW) set search_mode value
+    search_mode - was: 'key'
+    now: 'value'
 
     (CDSL::MW) hRRiSIkesha
 
@@ -391,8 +476,9 @@ REPL Session Example
 
     <MWEntry: 263938.1: hṛṣīkeśatva = hṛṣīkeśa—tva n.>
 
-    (CDSL::MW) search_mode both
-    Search mode set to 'both'.
+    (CDSL::MW) set search_mode both
+    search_mode - was: 'value'
+    now: 'both'
 
     (CDSL::MW) hRRiSIkesha
 
@@ -446,14 +532,13 @@ REPL Session Example
     (CDSL::WIL,MW) use MW AP90 MWE AE
     Using 4 dictionaries: ['MW', 'AP90', 'MWE', 'AE']
 
-    (CDSL::MW+3) use ALL
+    (CDSL::MW+3) use --all
     Using 5 dictionaries: ['AP90', 'MW', 'MWE', 'AE', 'WIL']
 
-    (CDSL::AP90+3) use NONE
+    (CDSL::AP90+3) use --none
     Using 0 dictionaries: []
 
-    (CDSL::None) exit
-    Bye
+    (CDSL::None) quit
 
 
 Credits

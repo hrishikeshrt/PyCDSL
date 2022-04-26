@@ -39,7 +39,11 @@ Features
 
 * CDSL Corpus Management (Download, Update, Access)
 * Unified Programmable Interface to access all dictionaries available at CDSL
-* Console Command and REPL Interface for easy dictionary search
+* Command Line Interfaces for quick and easy search
+
+  * Console Command: :code:`cdsl`
+  * REPL Interface (*powered by* :code:`cmd2`)
+
 * Extensive support for transliteration using :code:`indic-transliteration` module
 * Search by key, value or both
 
