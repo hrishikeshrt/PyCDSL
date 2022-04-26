@@ -4,6 +4,7 @@
 
 ###############################################################################
 
+import logging
 from typing import List
 
 import cmd2
@@ -19,6 +20,14 @@ from .constants import (
     DEFAULT_SEARCH_MODE
 )
 from . import __version__
+
+###############################################################################
+# Logging
+
+LOGGER = logging.getLogger()  # root logger
+if not LOGGER.hasHandlers():
+    LOGGER.addHandler(logging.StreamHandler())
+LOGGER.setLevel(logging.INFO)
 
 ###############################################################################
 
@@ -130,6 +139,9 @@ class CDSLShell(BasicShell):
         self.limit = 50
         self.offset = None
 
+        # Logger Level
+        self.loglevel = "INFO"
+
         self.add_settable(
             cmd2.utils.Settable(
                 "search_mode",
@@ -165,6 +177,16 @@ class CDSLShell(BasicShell):
                 self
             )
         )
+        self.add_settable(
+            cmd2.utils.Settable(
+                "loglevel",
+                str.upper,
+                "Set Logger Level",
+                self,
+                choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+                onchange_cb=self._set_loglevel,
+            )
+        )
 
         # ------------------------------------------------------------------- #
 
@@ -177,6 +199,11 @@ class CDSLShell(BasicShell):
         )
         self.dict_ids = dict_ids
         self.active_dicts = None
+
+    # ----------------------------------------------------------------------- #
+
+    def _set_loglevel(self, param_name, old_value, new_value):
+        LOGGER.setLevel(getattr(logging, new_value))
 
     # ----------------------------------------------------------------------- #
     # Dictionary Information
@@ -238,6 +265,7 @@ class CDSLShell(BasicShell):
             for dict_id in self.cdsl.available_dicts
             if dict_id.startswith(text.upper())
         ]
+
     use_parser = cmd2.Cmd2ArgumentParser()
     use_parser.add_argument(
         "dict_ids",
